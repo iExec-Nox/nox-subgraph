@@ -36,26 +36,36 @@ describe("Describe entity assertions", () => {
   // https://thegraph.com/docs/en/subgraphs/developing/creating/unit-testing-framework/#write-a-unit-test
 
   test("Allowed created and stored", () => {
-    assert.entityCount("Allowed", 1)
+    assert.entityCount("Allowed", 1);
+    let sender = Address.fromString(
+      "0x0000000000000000000000000000000000000001"
+    );
+    let account = Address.fromString(
+      "0x0000000000000000000000000000000000000001"
+    );
+    let handle = Bytes.fromI32(1234567890);
+    let testEvent = createAllowedEvent(sender, account, handle);
+    // Build the ID the same way the handler does: transaction.hash.concatI32(logIndex.toI32())
+    let entityId = testEvent.transaction.hash.concatI32(testEvent.logIndex.toI32())
+    let entityIdHex = entityId.toHexString()
 
-    // 0xa16081f360e3847006db660bae1c6d1b2e17ec2a is the default address used in newMockEvent() function
     assert.fieldEquals(
       "Allowed",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      entityIdHex,
       "sender",
       "0x0000000000000000000000000000000000000001"
     )
     assert.fieldEquals(
       "Allowed",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      entityIdHex,
       "account",
       "0x0000000000000000000000000000000000000001"
     )
     assert.fieldEquals(
       "Allowed",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      entityIdHex,
       "handle",
-      "1234567890"
+      handle.toHexString()
     )
 
     // More assert options:
