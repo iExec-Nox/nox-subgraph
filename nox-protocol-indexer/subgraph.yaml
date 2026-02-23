@@ -1,0 +1,44 @@
+specVersion: 1.3.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: ACL
+    network: arbitrum-sepolia
+    source:
+      address: "0xdc91ec3f965f2f5f143dbbfcc92cc1340857d3d1"
+      abi: ACL
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Allowed
+        - Initialized
+        - MarkedAsPubliclyDecryptable
+        - NoxComputeUpdated
+        - OwnershipTransferred
+        - Upgraded
+        - ViewerAdded
+      abis:
+        - name: ACL
+          file: ./abis/ACL.json
+      eventHandlers:
+        - event: Allowed(indexed address,indexed address,indexed bytes32)
+          handler: handleAllowed
+        - event: Initialized(uint64)
+          handler: handleInitialized
+        - event: MarkedAsPubliclyDecryptable(indexed address,indexed bytes32)
+          handler: handleMarkedAsPubliclyDecryptable
+        - event: NoxComputeUpdated(indexed address)
+          handler: handleNoxComputeUpdated
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
+        - event: ViewerAdded(indexed address,indexed address,indexed bytes32)
+          handler: handleViewerAdded
+      file: ./src/acl.ts
