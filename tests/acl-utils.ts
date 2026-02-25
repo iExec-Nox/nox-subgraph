@@ -1,143 +1,124 @@
-import { newMockEvent } from "matchstick-as"
-import { ethereum, Address, Bytes, BigInt } from "@graphprotocol/graph-ts"
+import { Address, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts';
+import { newMockEvent } from 'matchstick-as';
 import {
-  Allowed,
-  Initialized,
-  MarkedAsPubliclyDecryptable,
-  NoxComputeUpdated,
-  OwnershipTransferred,
-  Upgraded,
-  ViewerAdded
-} from "../generated/ACL/ACL"
+    Allowed,
+    Initialized,
+    MarkedAsPubliclyDecryptable,
+    NoxComputeUpdated,
+    OwnershipTransferred,
+    Upgraded,
+    ViewerAdded,
+} from '../generated/ACL/ACL';
 
-export function createAllowedEvent(
-  sender: Address,
-  account: Address,
-  handle: Bytes
-): Allowed {
-  let allowedEvent = changetype<Allowed>(newMockEvent())
+export function createAllowedEvent(sender: Address, account: Address, handle: Bytes): Allowed {
+    const allowedEvent = changetype<Allowed>(newMockEvent());
 
-  allowedEvent.parameters = new Array()
+    allowedEvent.parameters = [];
 
-  allowedEvent.parameters.push(
-    new ethereum.EventParam("sender", ethereum.Value.fromAddress(sender))
-  )
-  allowedEvent.parameters.push(
-    new ethereum.EventParam("account", ethereum.Value.fromAddress(account))
-  )
-  allowedEvent.parameters.push(
-    new ethereum.EventParam("handle", ethereum.Value.fromFixedBytes(handle))
-  )
+    allowedEvent.parameters.push(
+        new ethereum.EventParam('sender', ethereum.Value.fromAddress(sender)),
+    );
+    allowedEvent.parameters.push(
+        new ethereum.EventParam('account', ethereum.Value.fromAddress(account)),
+    );
+    allowedEvent.parameters.push(
+        new ethereum.EventParam('handle', ethereum.Value.fromFixedBytes(handle)),
+    );
 
-  return allowedEvent
+    return allowedEvent;
 }
 
 export function createInitializedEvent(version: BigInt): Initialized {
-  let initializedEvent = changetype<Initialized>(newMockEvent())
+    const initializedEvent = changetype<Initialized>(newMockEvent());
 
-  initializedEvent.parameters = new Array()
+    initializedEvent.parameters = [];
 
-  initializedEvent.parameters.push(
-    new ethereum.EventParam(
-      "version",
-      ethereum.Value.fromUnsignedBigInt(version)
-    )
-  )
+    initializedEvent.parameters.push(
+        new ethereum.EventParam('version', ethereum.Value.fromUnsignedBigInt(version)),
+    );
 
-  return initializedEvent
+    return initializedEvent;
 }
 
 export function createMarkedAsPubliclyDecryptableEvent(
-  sender: Address,
-  handle: Bytes
+    sender: Address,
+    handle: Bytes,
 ): MarkedAsPubliclyDecryptable {
-  let markedAsPubliclyDecryptableEvent =
-    changetype<MarkedAsPubliclyDecryptable>(newMockEvent())
+    const markedAsPubliclyDecryptableEvent =
+        changetype<MarkedAsPubliclyDecryptable>(newMockEvent());
 
-  markedAsPubliclyDecryptableEvent.parameters = new Array()
+    markedAsPubliclyDecryptableEvent.parameters = [];
 
-  markedAsPubliclyDecryptableEvent.parameters.push(
-    new ethereum.EventParam("sender", ethereum.Value.fromAddress(sender))
-  )
-  markedAsPubliclyDecryptableEvent.parameters.push(
-    new ethereum.EventParam("handle", ethereum.Value.fromFixedBytes(handle))
-  )
+    markedAsPubliclyDecryptableEvent.parameters.push(
+        new ethereum.EventParam('sender', ethereum.Value.fromAddress(sender)),
+    );
+    markedAsPubliclyDecryptableEvent.parameters.push(
+        new ethereum.EventParam('handle', ethereum.Value.fromFixedBytes(handle)),
+    );
 
-  return markedAsPubliclyDecryptableEvent
+    return markedAsPubliclyDecryptableEvent;
 }
 
-export function createNoxComputeUpdatedEvent(
-  newNoxCompute: Address
-): NoxComputeUpdated {
-  let noxComputeUpdatedEvent = changetype<NoxComputeUpdated>(newMockEvent())
+export function createNoxComputeUpdatedEvent(newNoxCompute: Address): NoxComputeUpdated {
+    const noxComputeUpdatedEvent = changetype<NoxComputeUpdated>(newMockEvent());
 
-  noxComputeUpdatedEvent.parameters = new Array()
+    noxComputeUpdatedEvent.parameters = [];
 
-  noxComputeUpdatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "newNoxCompute",
-      ethereum.Value.fromAddress(newNoxCompute)
-    )
-  )
+    noxComputeUpdatedEvent.parameters.push(
+        new ethereum.EventParam('newNoxCompute', ethereum.Value.fromAddress(newNoxCompute)),
+    );
 
-  return noxComputeUpdatedEvent
+    return noxComputeUpdatedEvent;
 }
 
 export function createOwnershipTransferredEvent(
-  previousOwner: Address,
-  newOwner: Address
+    previousOwner: Address,
+    newOwner: Address,
 ): OwnershipTransferred {
-  let ownershipTransferredEvent =
-    changetype<OwnershipTransferred>(newMockEvent())
+    const ownershipTransferredEvent = changetype<OwnershipTransferred>(newMockEvent());
 
-  ownershipTransferredEvent.parameters = new Array()
+    ownershipTransferredEvent.parameters = [];
 
-  ownershipTransferredEvent.parameters.push(
-    new ethereum.EventParam(
-      "previousOwner",
-      ethereum.Value.fromAddress(previousOwner)
-    )
-  )
-  ownershipTransferredEvent.parameters.push(
-    new ethereum.EventParam("newOwner", ethereum.Value.fromAddress(newOwner))
-  )
+    ownershipTransferredEvent.parameters.push(
+        new ethereum.EventParam('previousOwner', ethereum.Value.fromAddress(previousOwner)),
+    );
+    ownershipTransferredEvent.parameters.push(
+        new ethereum.EventParam('newOwner', ethereum.Value.fromAddress(newOwner)),
+    );
 
-  return ownershipTransferredEvent
+    return ownershipTransferredEvent;
 }
 
 export function createUpgradedEvent(implementation: Address): Upgraded {
-  let upgradedEvent = changetype<Upgraded>(newMockEvent())
+    const upgradedEvent = changetype<Upgraded>(newMockEvent());
 
-  upgradedEvent.parameters = new Array()
+    upgradedEvent.parameters = [];
 
-  upgradedEvent.parameters.push(
-    new ethereum.EventParam(
-      "implementation",
-      ethereum.Value.fromAddress(implementation)
-    )
-  )
+    upgradedEvent.parameters.push(
+        new ethereum.EventParam('implementation', ethereum.Value.fromAddress(implementation)),
+    );
 
-  return upgradedEvent
+    return upgradedEvent;
 }
 
 export function createViewerAddedEvent(
-  sender: Address,
-  viewer: Address,
-  handle: Bytes
+    sender: Address,
+    viewer: Address,
+    handle: Bytes,
 ): ViewerAdded {
-  let viewerAddedEvent = changetype<ViewerAdded>(newMockEvent())
+    const viewerAddedEvent = changetype<ViewerAdded>(newMockEvent());
 
-  viewerAddedEvent.parameters = new Array()
+    viewerAddedEvent.parameters = [];
 
-  viewerAddedEvent.parameters.push(
-    new ethereum.EventParam("sender", ethereum.Value.fromAddress(sender))
-  )
-  viewerAddedEvent.parameters.push(
-    new ethereum.EventParam("viewer", ethereum.Value.fromAddress(viewer))
-  )
-  viewerAddedEvent.parameters.push(
-    new ethereum.EventParam("handle", ethereum.Value.fromFixedBytes(handle))
-  )
+    viewerAddedEvent.parameters.push(
+        new ethereum.EventParam('sender', ethereum.Value.fromAddress(sender)),
+    );
+    viewerAddedEvent.parameters.push(
+        new ethereum.EventParam('viewer', ethereum.Value.fromAddress(viewer)),
+    );
+    viewerAddedEvent.parameters.push(
+        new ethereum.EventParam('handle', ethereum.Value.fromFixedBytes(handle)),
+    );
 
-  return viewerAddedEvent
+    return viewerAddedEvent;
 }
