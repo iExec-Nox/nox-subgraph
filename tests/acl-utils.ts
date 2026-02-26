@@ -4,7 +4,6 @@ import {
     Allowed,
     Initialized,
     MarkedAsPubliclyDecryptable,
-    NoxComputeUpdated,
     OwnershipTransferred,
     Upgraded,
     ViewerAdded,
@@ -57,18 +56,6 @@ export function createMarkedAsPubliclyDecryptableEvent(
     );
 
     return markedAsPubliclyDecryptableEvent;
-}
-
-export function createNoxComputeUpdatedEvent(newNoxCompute: Address): NoxComputeUpdated {
-    const noxComputeUpdatedEvent = changetype<NoxComputeUpdated>(newMockEvent());
-
-    noxComputeUpdatedEvent.parameters = [];
-
-    noxComputeUpdatedEvent.parameters.push(
-        new ethereum.EventParam('newNoxCompute', ethereum.Value.fromAddress(newNoxCompute)),
-    );
-
-    return noxComputeUpdatedEvent;
 }
 
 export function createOwnershipTransferredEvent(

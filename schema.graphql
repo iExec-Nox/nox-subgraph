@@ -25,14 +25,6 @@ type MarkedAsPubliclyDecryptable @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type NoxComputeUpdated @entity(immutable: true) {
-  id: Bytes!
-  newNoxCompute: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
 type OwnershipTransferred @entity(immutable: true) {
   id: Bytes!
   previousOwner: Bytes! # address

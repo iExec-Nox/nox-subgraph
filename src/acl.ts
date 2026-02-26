@@ -3,7 +3,6 @@ import {
     Allowed as AllowedEvent,
     Initialized as InitializedEvent,
     MarkedAsPubliclyDecryptable as MarkedAsPubliclyDecryptableEvent,
-    NoxComputeUpdated as NoxComputeUpdatedEvent,
     OwnershipTransferred as OwnershipTransferredEvent,
     Upgraded as UpgradedEvent,
     ViewerAdded as ViewerAddedEvent,
@@ -13,7 +12,6 @@ import {
     Handle,
     Initialized,
     MarkedAsPubliclyDecryptable,
-    NoxComputeUpdated,
     OwnershipTransferred,
     Upgraded,
     ViewerAdded,
@@ -87,17 +85,6 @@ export function handleMarkedAsPubliclyDecryptable(event: MarkedAsPubliclyDecrypt
     handle.blockTimestamp = event.block.timestamp;
     handle.transactionHash = event.transaction.hash;
     handle.save();
-}
-
-export function handleNoxComputeUpdated(event: NoxComputeUpdatedEvent): void {
-    const entity = new NoxComputeUpdated(event.transaction.hash.concatI32(event.logIndex.toI32()));
-    entity.newNoxCompute = event.params.newNoxCompute;
-
-    entity.blockNumber = event.block.number;
-    entity.blockTimestamp = event.block.timestamp;
-    entity.transactionHash = event.transaction.hash;
-
-    entity.save();
 }
 
 export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {
