@@ -16,11 +16,14 @@
         "prepare": "husky",
         "codegen": "graph codegen",
         "build": "graph build",
-        "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ nox-protocol-indexer",
+        "deploy": "graph deploy --node ${GRAPHNODE_URL} --ipfs ${IPFS_URL} nox-protocol-indexer-${NETWORK_NAME} --version-label ${VERSION_LABEL:-dev}",
+        "deploy-studio": "graph deploy ${SUBGRAPH_SLUG} --deploy-key ${SUBGRAPH_DEPLOY_KEY} --network ${SUBGRAPH_NETWORK_NAME} --version-label ${VERSION_LABEL}",
         "create-local": "graph create --node http://localhost:8020/ nox-protocol-indexer",
         "remove-local": "graph remove --node http://localhost:8020/ nox-protocol-indexer",
         "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 nox-protocol-indexer",
+        "all": "npm run codegen && npm run build && npm run test",
         "format": "prettier --write \"(src|tests)/**/*.{js,ts}\"",
+        "check-format": "prettier --check \"(src|tests)/**/*.{js,ts}\"",
         "test": "graph test"
     },
     "lint-staged": {

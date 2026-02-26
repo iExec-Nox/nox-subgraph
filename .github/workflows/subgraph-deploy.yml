@@ -1,0 +1,68 @@
+name: Subgraph - Deploy on self-hosted node
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment (must match a GitHub Environment name)'
+        required: true
+        default: arbitrumSepolia
+        type: choice
+        options:
+          - arbitrumSepolia
+          - arbitrum
+
+jobs:
+  build-and-test:
+    uses: ./.github/workflows/subgraph-ci.yml
+    with:
+      node-version: 20
+
+  deploy:
+    needs: build-and-test
+    runs-on:
+      group: Azure_runners
+      labels: [ self-hosted, Linux, X64 ]
+    # Associate the job with a GitHub Environment which has pre-defined variables and secrets.
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set Version Label
+        id: set_version
+        run: |
+          if [[ "${{ github.event.inputs.environment }}" == "arbitrumSepolia" ]]; then
+            echo "version=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+          else
+            version=$(npm pkg get version | sed 's/"//g')
+            echo "version=$version" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and Test
+        run: npm run all
+
+      - name: Deploy Subgraph
+        env:
+          NETWORK_NAME: ${{ github.event.inputs.environment }}
+          VERSION_LABEL: ${{ steps.set_version.outputs.version }}
+          GRAPHNODE_URL: ${{ vars.GRAPHNODE_URL }}
+          IPFS_URL: ${{ vars.IPFS_URL }}
+          DEPLOY_ENV: ${{ vars.ENV_NAME }}
+        run: |
+          echo "Starting deployment with the following parameters:"
+          echo "  Network Name: $NETWORK_NAME"
+          echo "  Version Label: $VERSION_LABEL"
+          echo "  DEPLOY_ENV: $DEPLOY_ENV"
+          echo "  GRAPHNODE_URL: $GRAPHNODE_URL"
+          echo "  IPFS_URL: $IPFS_URL"
+          npm run deploy
+        shell: bash
