@@ -10,7 +10,8 @@ dataSources:
     source:
       address: "0xdc91ec3f965f2f5f143dbbfcc92cc1340857d3d1"
       abi: ACL
-      startBlock: 0
+      startBlock: 234946800
+
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9

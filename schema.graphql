@@ -59,3 +59,13 @@ type ViewerAdded @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type Handle @entity (immutable: false) {
+  id: Bytes!
+  isPublic: Boolean!
+  viewers: [Bytes!]! # address[]
+  allowedAccounts: [Bytes!]! # address[]
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

@@ -32,11 +32,11 @@
         "@graphprotocol/graph-cli": "0.98.1",
         "@graphprotocol/graph-ts": "0.38.2",
         "lint-staged": "^16.2.7",
+        "matchstick-as": "^0.6.0",
         "prettier-plugin-organize-imports": "^4.3.0"
     },
     "devDependencies": {
         "husky": "^9.1.7",
-        "matchstick-as": "0.6.0",
         "prettier": "^3.8.1"
     }
 }
