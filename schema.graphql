@@ -27,11 +27,18 @@ type ViewerAdded @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type Handle @entity (immutable: false) {
+type Handle @entity(immutable: true) {
   id: Bytes!
-  isPublic: Boolean!
-  viewers: [Bytes!]! # address[]
-  allowedAccounts: [Bytes!]! # address[]
+  isPubliclyDecryptable: Boolean!
+  roles: [HandleRole!]! @derivedFrom(field: "handle")
+}
+
+type HandleRole @entity(immutable: true) {
+  id: Bytes!
+  handle: Handle!
+  account: Bytes!
+  role: String!         # "ADMIN" | "VIEWER"
+  grantedBy: Bytes!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

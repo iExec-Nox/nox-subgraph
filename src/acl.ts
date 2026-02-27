@@ -4,15 +4,19 @@ import {
     MarkedAsPubliclyDecryptable as MarkedAsPubliclyDecryptableEvent,
     ViewerAdded as ViewerAddedEvent,
 } from '../generated/ACL/ACL';
-import { Allowed, Handle, MarkedAsPubliclyDecryptable, ViewerAdded } from '../generated/schema';
+import {
+    Allowed,
+    Handle,
+    HandleRole,
+    MarkedAsPubliclyDecryptable,
+    ViewerAdded,
+} from '../generated/schema';
 
 function getOrCreateHandle(handleId: Bytes): Handle {
     let handle = Handle.load(handleId);
     if (handle == null) {
         handle = new Handle(handleId);
-        handle.isPublic = false;
-        handle.viewers = [];
-        handle.allowedAccounts = [];
+        handle.isPubliclyDecryptable = false;
     }
     return handle;
 }
@@ -30,17 +34,15 @@ export function handleAllowed(event: AllowedEvent): void {
     entity.save();
 
     const handle = getOrCreateHandle(event.params.handle);
-    const account = event.params.account;
-
-    if (!handle.allowedAccounts.includes(account)) {
-        const allowedAccounts = handle.allowedAccounts;
-        allowedAccounts.push(account);
-        handle.allowedAccounts = allowedAccounts;
-    }
-
-    handle.blockNumber = event.block.number;
-    handle.blockTimestamp = event.block.timestamp;
-    handle.transactionHash = event.transaction.hash;
+    const role = new HandleRole(event.transaction.hash.concatI32(event.logIndex.toI32()));
+    role.handle = handle.id;
+    role.account = event.params.account;
+    role.role = 'ADMIN';
+    role.grantedBy = event.params.sender;
+    role.blockNumber = event.block.number;
+    role.blockTimestamp = event.block.timestamp;
+    role.transactionHash = event.transaction.hash;
+    role.save();
     handle.save();
 }
 
@@ -58,10 +60,7 @@ export function handleMarkedAsPubliclyDecryptable(event: MarkedAsPubliclyDecrypt
     entity.save();
 
     const handle = getOrCreateHandle(event.params.handle);
-    handle.isPublic = true;
-    handle.blockNumber = event.block.number;
-    handle.blockTimestamp = event.block.timestamp;
-    handle.transactionHash = event.transaction.hash;
+    handle.isPubliclyDecryptable = true;
     handle.save();
 }
 
@@ -76,16 +75,18 @@ export function handleViewerAdded(event: ViewerAddedEvent): void {
     entity.save();
 
     const handle = getOrCreateHandle(event.params.handle);
-    const viewer = event.params.viewer;
 
-    if (!handle.viewers.includes(viewer)) {
-        const viewers = handle.viewers;
-        viewers.push(viewer);
-        handle.viewers = viewers;
-    }
+    // Create a HandleRole for the viewer
+    const roleId = event.transaction.hash.concatI32(event.logIndex.toI32());
+    const role = new HandleRole(roleId);
+    role.handle = handle.id;
+    role.account = event.params.viewer;
+    role.role = 'VIEWER';
+    role.grantedBy = event.params.sender;
+    role.blockNumber = event.block.number;
+    role.blockTimestamp = event.block.timestamp;
+    role.transactionHash = event.transaction.hash;
+    role.save();
 
-    handle.blockNumber = event.block.number;
-    handle.blockTimestamp = event.block.timestamp;
-    handle.transactionHash = event.transaction.hash;
     handle.save();
 }

@@ -1,9 +1,18 @@
-import { Address, Bytes, ethereum } from '@graphprotocol/graph-ts';
+import { Address, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { newMockEvent } from 'matchstick-as';
 import { Allowed, MarkedAsPubliclyDecryptable, ViewerAdded } from '../generated/ACL/ACL';
 
-export function createAllowedEvent(sender: Address, account: Address, handle: Bytes): Allowed {
+export function createAllowedEvent(
+    sender: Address,
+    account: Address,
+    handle: Bytes,
+    logIndex: i32 = 0,
+): Allowed {
     const allowedEvent = changetype<Allowed>(newMockEvent());
+
+    // Set unique transaction hash and log index for each event
+    allowedEvent.transaction.hash = Bytes.fromI32(logIndex);
+    allowedEvent.logIndex = BigInt.fromI32(logIndex);
 
     allowedEvent.parameters = [];
 
@@ -23,9 +32,14 @@ export function createAllowedEvent(sender: Address, account: Address, handle: By
 export function createMarkedAsPubliclyDecryptableEvent(
     sender: Address,
     handle: Bytes,
+    logIndex: i32 = 0,
 ): MarkedAsPubliclyDecryptable {
     const markedAsPubliclyDecryptableEvent =
         changetype<MarkedAsPubliclyDecryptable>(newMockEvent());
+
+    // Set unique transaction hash and log index for each event
+    markedAsPubliclyDecryptableEvent.transaction.hash = Bytes.fromI32(logIndex);
+    markedAsPubliclyDecryptableEvent.logIndex = BigInt.fromI32(logIndex);
 
     markedAsPubliclyDecryptableEvent.parameters = [];
 
@@ -43,8 +57,13 @@ export function createViewerAddedEvent(
     sender: Address,
     viewer: Address,
     handle: Bytes,
+    logIndex: i32 = 0,
 ): ViewerAdded {
     const viewerAddedEvent = changetype<ViewerAdded>(newMockEvent());
+
+    // Set unique transaction hash and log index for each event
+    viewerAddedEvent.transaction.hash = Bytes.fromI32(logIndex);
+    viewerAddedEvent.logIndex = BigInt.fromI32(logIndex);
 
     viewerAddedEvent.parameters = [];
 

@@ -27,109 +27,112 @@ describe('Handle Entity Tests', () => {
 
             const handleIdHex = handleId.toHexString();
             assert.entityCount('Handle', 1);
-            assert.fieldEquals('Handle', handleIdHex, 'isPublic', 'false');
+            assert.entityCount('HandleRole', 1);
+            assert.fieldEquals('Handle', handleIdHex, 'isPubliclyDecryptable', 'false');
             assert.fieldEquals('Handle', handleIdHex, 'id', handleIdHex);
-            assert.fieldEquals(
-                'Handle',
-                handleIdHex,
-                'allowedAccounts',
-                `[${account1.toHexString()}]`,
-            );
-            assert.fieldEquals('Handle', handleIdHex, 'viewers', '[]');
         });
 
-        test('Handle is initialized with empty arrays', () => {
+        test('HandleRole is created with ADMIN role for Allowed event', () => {
             clearStore();
             const event = createAllowedEvent(sender1, account1, handleId);
             handleAllowed(event);
 
-            const handleIdHex = handleId.toHexString();
-            assert.entityCount('Handle', 1);
-            assert.fieldEquals('Handle', handleIdHex, 'isPublic', 'false');
+            // Get the role ID (transaction hash + log index)
+            const roleId = event.transaction.hash.concatI32(event.logIndex.toI32());
+            const roleIdHex = roleId.toHexString();
+
+            assert.entityCount('HandleRole', 1);
+            assert.fieldEquals('HandleRole', roleIdHex, 'role', 'ADMIN');
+            assert.fieldEquals('HandleRole', roleIdHex, 'account', account1.toHexString());
+            assert.fieldEquals('HandleRole', roleIdHex, 'grantedBy', sender1.toHexString());
         });
     });
 
-    describe('Handle allowedAccounts Updates', () => {
-        test('First allowed account is added to Handle', () => {
+    describe('HandleRole ADMIN Updates', () => {
+        test('First ADMIN role is created for Allowed event', () => {
             clearStore();
             const event = createAllowedEvent(sender1, account1, handleId);
             handleAllowed(event);
 
-            const handleIdHex = handleId.toHexString();
             assert.entityCount('Handle', 1);
-            assert.fieldEquals('Handle', handleIdHex, 'isPublic', 'false');
+            assert.entityCount('HandleRole', 1);
         });
 
-        test('Multiple allowed accounts are added to Handle', () => {
+        test('Multiple ADMIN roles are created for different accounts', () => {
             clearStore();
-            const event1 = createAllowedEvent(sender1, account1, handleId);
-            const event2 = createAllowedEvent(sender1, account2, handleId);
+            const event1 = createAllowedEvent(sender1, account1, handleId, 1);
+            const event2 = createAllowedEvent(sender1, account2, handleId, 2);
             handleAllowed(event1);
             handleAllowed(event2);
 
-            const handleIdHex = handleId.toHexString();
             assert.entityCount('Handle', 1);
-            assert.fieldEquals('Handle', handleIdHex, 'isPublic', 'false');
+            assert.entityCount('HandleRole', 2);
         });
 
-        test('Duplicate allowed accounts are not added', () => {
+        test('Multiple ADMIN roles can be created for same account (historical record)', () => {
             clearStore();
-            const event1 = createAllowedEvent(sender1, account1, handleId);
-            const event2 = createAllowedEvent(sender1, account1, handleId);
+            const event1 = createAllowedEvent(sender1, account1, handleId, 1);
+            const event2 = createAllowedEvent(sender1, account1, handleId, 2);
             handleAllowed(event1);
             handleAllowed(event2);
 
-            const handleIdHex = handleId.toHexString();
+            // Both events create separate HandleRole entities (historical record)
             assert.entityCount('Handle', 1);
+            assert.entityCount('HandleRole', 2);
         });
     });
 
-    describe('Handle viewers Updates', () => {
-        test('First viewer is added to Handle', () => {
+    describe('HandleRole VIEWER Updates', () => {
+        test('VIEWER role is created when ViewerAdded event is processed', () => {
             clearStore();
             const event = createViewerAddedEvent(sender1, viewer1, handleId);
             handleViewerAdded(event);
 
-            const handleIdHex = handleId.toHexString();
+            const roleId = event.transaction.hash.concatI32(event.logIndex.toI32());
+            const roleIdHex = roleId.toHexString();
+
             assert.entityCount('Handle', 1);
-            assert.fieldEquals('Handle', handleIdHex, 'isPublic', 'false');
+            assert.entityCount('HandleRole', 1);
+            assert.fieldEquals('HandleRole', roleIdHex, 'role', 'VIEWER');
+            assert.fieldEquals('HandleRole', roleIdHex, 'account', viewer1.toHexString());
+            assert.fieldEquals('HandleRole', roleIdHex, 'grantedBy', sender1.toHexString());
         });
 
-        test('Multiple viewers are added to Handle', () => {
+        test('Multiple VIEWER roles are created for different viewers', () => {
             clearStore();
-            const event1 = createViewerAddedEvent(sender1, viewer1, handleId);
-            const event2 = createViewerAddedEvent(sender1, viewer2, handleId);
+            const event1 = createViewerAddedEvent(sender1, viewer1, handleId, 1);
+            const event2 = createViewerAddedEvent(sender1, viewer2, handleId, 2);
             handleViewerAdded(event1);
             handleViewerAdded(event2);
 
-            const handleIdHex = handleId.toHexString();
             assert.entityCount('Handle', 1);
+            assert.entityCount('HandleRole', 2);
         });
 
-        test('Duplicate viewers are not added', () => {
+        test('Multiple VIEWER roles can be created for same viewer (historical record)', () => {
             clearStore();
-            const event1 = createViewerAddedEvent(sender1, viewer1, handleId);
-            const event2 = createViewerAddedEvent(sender1, viewer1, handleId);
+            const event1 = createViewerAddedEvent(sender1, viewer1, handleId, 1);
+            const event2 = createViewerAddedEvent(sender1, viewer1, handleId, 2);
             handleViewerAdded(event1);
             handleViewerAdded(event2);
 
-            const handleIdHex = handleId.toHexString();
             assert.entityCount('Handle', 1);
+            assert.entityCount('HandleRole', 2);
         });
     });
 
-    describe('Handle isPublic Updates', () => {
-        test('Handle isPublic is set to true when MarkedAsPubliclyDecryptable event is processed', () => {
+    describe('Handle isPubliclyDecryptable Updates', () => {
+        test('Handle isPubliclyDecryptable is set to true when MarkedAsPubliclyDecryptable event is processed', () => {
             clearStore();
             const event = createMarkedAsPubliclyDecryptableEvent(sender1, handleId);
             handleMarkedAsPubliclyDecryptable(event);
 
             const handleIdHex = handleId.toHexString();
             assert.entityCount('Handle', 1);
-            assert.fieldEquals('Handle', handleIdHex, 'isPublic', 'true');
+            assert.fieldEquals('Handle', handleIdHex, 'isPubliclyDecryptable', 'true');
         });
 
-        test('Handle isPublic remains true after multiple MarkedAsPubliclyDecryptable events', () => {
+        test('Handle isPubliclyDecryptable remains true after multiple MarkedAsPubliclyDecryptable events', () => {
             clearStore();
             const event1 = createMarkedAsPubliclyDecryptableEvent(sender1, handleId);
             const event2 = createMarkedAsPubliclyDecryptableEvent(sender1, handleId);
@@ -138,16 +141,16 @@ describe('Handle Entity Tests', () => {
 
             const handleIdHex = handleId.toHexString();
             assert.entityCount('Handle', 1);
-            assert.fieldEquals('Handle', handleIdHex, 'isPublic', 'true');
+            assert.fieldEquals('Handle', handleIdHex, 'isPubliclyDecryptable', 'true');
         });
     });
 
     describe('Handle Integration Tests', () => {
-        test('Handle accumulates data from multiple event types', () => {
+        test('Handle accumulates roles from multiple event types', () => {
             clearStore();
-            const allowedEvent = createAllowedEvent(sender1, account1, handleId);
-            const viewerEvent = createViewerAddedEvent(sender1, viewer1, handleId);
-            const publicEvent = createMarkedAsPubliclyDecryptableEvent(sender1, handleId);
+            const allowedEvent = createAllowedEvent(sender1, account1, handleId, 1);
+            const viewerEvent = createViewerAddedEvent(sender1, viewer1, handleId, 2);
+            const publicEvent = createMarkedAsPubliclyDecryptableEvent(sender1, handleId, 3);
 
             handleAllowed(allowedEvent);
             handleViewerAdded(viewerEvent);
@@ -155,17 +158,22 @@ describe('Handle Entity Tests', () => {
 
             const handleIdHex = handleId.toHexString();
             assert.entityCount('Handle', 1);
-            assert.fieldEquals('Handle', handleIdHex, 'isPublic', 'true');
+            assert.entityCount('HandleRole', 2); // 1 ADMIN + 1 VIEWER
+            assert.fieldEquals('Handle', handleIdHex, 'isPubliclyDecryptable', 'true');
         });
 
-        test('Handle updates block metadata correctly', () => {
+        test('HandleRole contains correct metadata', () => {
             clearStore();
             const event = createAllowedEvent(sender1, account1, handleId);
             handleAllowed(event);
 
-            const handleIdHex = handleId.toHexString();
-            assert.entityCount('Handle', 1);
-            assert.fieldEquals('Handle', handleIdHex, 'id', handleIdHex);
+            const roleId = event.transaction.hash.concatI32(event.logIndex.toI32());
+            const roleIdHex = roleId.toHexString();
+
+            assert.fieldEquals('HandleRole', roleIdHex, 'handle', handleId.toHexString());
+            assert.fieldEquals('HandleRole', roleIdHex, 'account', account1.toHexString());
+            assert.fieldEquals('HandleRole', roleIdHex, 'role', 'ADMIN');
+            assert.fieldEquals('HandleRole', roleIdHex, 'grantedBy', sender1.toHexString());
         });
     });
 
@@ -175,15 +183,16 @@ describe('Handle Entity Tests', () => {
             const handle1 = Bytes.fromI32(1_111_111_111);
             const handle2 = Bytes.fromI32(2_222_222_222);
 
-            const event1 = createAllowedEvent(sender1, account1, handle1);
-            const event2 = createAllowedEvent(sender1, account1, handle2);
+            const event1 = createAllowedEvent(sender1, account1, handle1, 1);
+            const event2 = createAllowedEvent(sender1, account1, handle2, 2);
 
             handleAllowed(event1);
             handleAllowed(event2);
 
             assert.entityCount('Handle', 2);
-            assert.fieldEquals('Handle', handle1.toHexString(), 'isPublic', 'false');
-            assert.fieldEquals('Handle', handle2.toHexString(), 'isPublic', 'false');
+            assert.entityCount('HandleRole', 2);
+            assert.fieldEquals('Handle', handle1.toHexString(), 'isPubliclyDecryptable', 'false');
+            assert.fieldEquals('Handle', handle2.toHexString(), 'isPubliclyDecryptable', 'false');
         });
     });
 });
