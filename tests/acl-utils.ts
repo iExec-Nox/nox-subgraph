@@ -1,13 +1,6 @@
-import { Address, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts';
+import { Address, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { newMockEvent } from 'matchstick-as';
-import {
-    Allowed,
-    Initialized,
-    MarkedAsPubliclyDecryptable,
-    OwnershipTransferred,
-    Upgraded,
-    ViewerAdded,
-} from '../generated/ACL/ACL';
+import { Allowed, MarkedAsPubliclyDecryptable, ViewerAdded } from '../generated/ACL/ACL';
 
 export function createAllowedEvent(sender: Address, account: Address, handle: Bytes): Allowed {
     const allowedEvent = changetype<Allowed>(newMockEvent());
@@ -27,18 +20,6 @@ export function createAllowedEvent(sender: Address, account: Address, handle: By
     return allowedEvent;
 }
 
-export function createInitializedEvent(version: BigInt): Initialized {
-    const initializedEvent = changetype<Initialized>(newMockEvent());
-
-    initializedEvent.parameters = [];
-
-    initializedEvent.parameters.push(
-        new ethereum.EventParam('version', ethereum.Value.fromUnsignedBigInt(version)),
-    );
-
-    return initializedEvent;
-}
-
 export function createMarkedAsPubliclyDecryptableEvent(
     sender: Address,
     handle: Bytes,
@@ -56,36 +37,6 @@ export function createMarkedAsPubliclyDecryptableEvent(
     );
 
     return markedAsPubliclyDecryptableEvent;
-}
-
-export function createOwnershipTransferredEvent(
-    previousOwner: Address,
-    newOwner: Address,
-): OwnershipTransferred {
-    const ownershipTransferredEvent = changetype<OwnershipTransferred>(newMockEvent());
-
-    ownershipTransferredEvent.parameters = [];
-
-    ownershipTransferredEvent.parameters.push(
-        new ethereum.EventParam('previousOwner', ethereum.Value.fromAddress(previousOwner)),
-    );
-    ownershipTransferredEvent.parameters.push(
-        new ethereum.EventParam('newOwner', ethereum.Value.fromAddress(newOwner)),
-    );
-
-    return ownershipTransferredEvent;
-}
-
-export function createUpgradedEvent(implementation: Address): Upgraded {
-    const upgradedEvent = changetype<Upgraded>(newMockEvent());
-
-    upgradedEvent.parameters = [];
-
-    upgradedEvent.parameters.push(
-        new ethereum.EventParam('implementation', ethereum.Value.fromAddress(implementation)),
-    );
-
-    return upgradedEvent;
 }
 
 export function createViewerAddedEvent(

@@ -1,21 +1,10 @@
 import { Bytes } from '@graphprotocol/graph-ts';
 import {
     Allowed as AllowedEvent,
-    Initialized as InitializedEvent,
     MarkedAsPubliclyDecryptable as MarkedAsPubliclyDecryptableEvent,
-    OwnershipTransferred as OwnershipTransferredEvent,
-    Upgraded as UpgradedEvent,
     ViewerAdded as ViewerAddedEvent,
 } from '../generated/ACL/ACL';
-import {
-    Allowed,
-    Handle,
-    Initialized,
-    MarkedAsPubliclyDecryptable,
-    OwnershipTransferred,
-    Upgraded,
-    ViewerAdded,
-} from '../generated/schema';
+import { Allowed, Handle, MarkedAsPubliclyDecryptable, ViewerAdded } from '../generated/schema';
 
 function getOrCreateHandle(handleId: Bytes): Handle {
     let handle = Handle.load(handleId);
@@ -55,17 +44,6 @@ export function handleAllowed(event: AllowedEvent): void {
     handle.save();
 }
 
-export function handleInitialized(event: InitializedEvent): void {
-    const entity = new Initialized(event.transaction.hash.concatI32(event.logIndex.toI32()));
-    entity.version = event.params.version;
-
-    entity.blockNumber = event.block.number;
-    entity.blockTimestamp = event.block.timestamp;
-    entity.transactionHash = event.transaction.hash;
-
-    entity.save();
-}
-
 export function handleMarkedAsPubliclyDecryptable(event: MarkedAsPubliclyDecryptableEvent): void {
     const entity = new MarkedAsPubliclyDecryptable(
         event.transaction.hash.concatI32(event.logIndex.toI32()),
@@ -85,27 +63,6 @@ export function handleMarkedAsPubliclyDecryptable(event: MarkedAsPubliclyDecrypt
     handle.blockTimestamp = event.block.timestamp;
     handle.transactionHash = event.transaction.hash;
     handle.save();
-}
-
-export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {
-    const entity = new OwnershipTransferred(
-        event.transaction.hash.concatI32(event.logIndex.toI32()),
-    );
-    entity.previousOwner = event.params.previousOwner;
-    entity.newOwner = event.params.newOwner;
-    entity.blockNumber = event.block.number;
-    entity.blockTimestamp = event.block.timestamp;
-    entity.transactionHash = event.transaction.hash;
-    entity.save();
-}
-
-export function handleUpgraded(event: UpgradedEvent): void {
-    const entity = new Upgraded(event.transaction.hash.concatI32(event.logIndex.toI32()));
-    entity.implementation = event.params.implementation;
-    entity.blockNumber = event.block.number;
-    entity.blockTimestamp = event.block.timestamp;
-    entity.transactionHash = event.transaction.hash;
-    entity.save();
 }
 
 export function handleViewerAdded(event: ViewerAddedEvent): void {

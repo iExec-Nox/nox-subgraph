@@ -8,7 +8,7 @@ dataSources:
       name: ACL
       network: arbitrum-sepolia
       source:
-          address: '0xdc91ec3f965f2f5f143dbbfcc92cc1340857d3d1'
+          address: '0x1F00Ab5bd16eeFFF270d24a6C4f31964010F2CE4'
           abi: ACL
           startBlock: 234946800
 
@@ -18,10 +18,7 @@ dataSources:
           language: wasm/assemblyscript
           entities:
               - Allowed
-              - Initialized
               - MarkedAsPubliclyDecryptable
-              - OwnershipTransferred
-              - Upgraded
               - ViewerAdded
           abis:
               - name: ACL
@@ -29,14 +26,8 @@ dataSources:
           eventHandlers:
               - event: Allowed(indexed address,indexed address,indexed bytes32)
                 handler: handleAllowed
-              - event: Initialized(uint64)
-                handler: handleInitialized
               - event: MarkedAsPubliclyDecryptable(indexed address,indexed bytes32)
                 handler: handleMarkedAsPubliclyDecryptable
-              - event: OwnershipTransferred(indexed address,indexed address)
-                handler: handleOwnershipTransferred
-              - event: Upgraded(indexed address)
-                handler: handleUpgraded
               - event: ViewerAdded(indexed address,indexed address,indexed bytes32)
                 handler: handleViewerAdded
           file: ./src/acl.ts
