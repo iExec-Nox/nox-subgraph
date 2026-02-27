@@ -1,6 +1,10 @@
 import { Address, Bytes } from '@graphprotocol/graph-ts';
 import { afterAll, assert, clearStore, describe, test } from 'matchstick-as/assembly/index';
-import { handleAllowed, handleMarkedAsPubliclyDecryptable, handleViewerAdded } from '../src/acl';
+import {
+    handleAllowed,
+    handleMarkedAsPubliclyDecryptable,
+    handleViewerAdded,
+} from '../src/NoxCompute';
 import {
     createAllowedEvent,
     createMarkedAsPubliclyDecryptableEvent,

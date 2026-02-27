@@ -5,11 +5,11 @@ schema:
     file: ./schema.graphql
 dataSources:
     - kind: ethereum
-      name: ACL
+      name: NoxCompute
       network: arbitrum-sepolia
       source:
           address: '0x1F00Ab5bd16eeFFF270d24a6C4f31964010F2CE4'
-          abi: ACL
+          abi: NoxCompute
           startBlock: 234946800
 
       mapping:
@@ -21,7 +21,7 @@ dataSources:
               - MarkedAsPubliclyDecryptable
               - ViewerAdded
           abis:
-              - name: ACL
+              - name: NoxCompute
                 file: ./abis/NoxCompute.json
           eventHandlers:
               - event: Allowed(indexed address,indexed address,indexed bytes32)
@@ -30,4 +30,4 @@ dataSources:
                 handler: handleMarkedAsPubliclyDecryptable
               - event: ViewerAdded(indexed address,indexed address,indexed bytes32)
                 handler: handleViewerAdded
-          file: ./src/acl.ts
+          file: ./src/NoxCompute.ts
