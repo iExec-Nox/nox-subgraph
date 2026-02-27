@@ -1,0 +1,42 @@
+{
+    "name": "nox-subgraph",
+    "version": "0.0.1",
+    "author": "iExec",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/iExec-Nox/nox-subgraph.git"
+    },
+    "homepage": "https://github.com/iExec-Nox/nox-subgraph#readme",
+    "bugs": "https://github.com/iExec-Nox/nox-subgraph/issues",
+    "license": "Apache-2.0",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "scripts": {
+        "prepare": "husky",
+        "codegen": "graph codegen",
+        "build": "graph build",
+        "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ nox-protocol-indexer",
+        "create-local": "graph create --node http://localhost:8020/ nox-protocol-indexer",
+        "remove-local": "graph remove --node http://localhost:8020/ nox-protocol-indexer",
+        "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 nox-protocol-indexer",
+        "format": "prettier --write \"(src|tests)/**/*.{js,ts}\"",
+        "test": "graph test"
+    },
+    "lint-staged": {
+        "*.{js,ts}": [
+            "prettier --write "
+        ]
+    },
+    "dependencies": {
+        "@graphprotocol/graph-cli": "0.98.1",
+        "@graphprotocol/graph-ts": "0.38.2",
+        "lint-staged": "^16.2.7",
+        "matchstick-as": "^0.6.0",
+        "prettier-plugin-organize-imports": "^4.3.0"
+    },
+    "devDependencies": {
+        "husky": "^9.1.7",
+        "prettier": "^3.8.1"
+    }
+}

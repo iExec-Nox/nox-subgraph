@@ -1,0 +1,45 @@
+type Allowed @entity(immutable: true) {
+  id: Bytes!
+  sender: Bytes! # address
+  account: Bytes! # address
+  handle: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MarkedAsPubliclyDecryptable @entity(immutable: true) {
+  id: Bytes!
+  sender: Bytes! # address
+  handle: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ViewerAdded @entity(immutable: true) {
+  id: Bytes!
+  sender: Bytes! # address
+  viewer: Bytes! # address
+  handle: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Handle @entity(immutable: true) {
+  id: Bytes!
+  isPubliclyDecryptable: Boolean!
+  roles: [HandleRole!]! @derivedFrom(field: "handle")
+}
+
+type HandleRole @entity(immutable: true) {
+  id: Bytes!
+  handle: Handle!
+  account: Bytes!
+  role: String!         # "ADMIN" | "VIEWER"
+  grantedBy: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
