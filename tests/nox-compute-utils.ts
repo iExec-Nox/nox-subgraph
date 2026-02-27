@@ -1,6 +1,10 @@
 import { Address, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { newMockEvent } from 'matchstick-as';
-import { Allowed, MarkedAsPubliclyDecryptable, ViewerAdded } from '../generated/ACL/ACL';
+import {
+    Allowed,
+    MarkedAsPubliclyDecryptable,
+    ViewerAdded,
+} from '../generated/NoxCompute/NoxCompute';
 
 export function createAllowedEvent(
     sender: Address,

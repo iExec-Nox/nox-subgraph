@@ -1,9 +1,9 @@
-import { Bytes } from '@graphprotocol/graph-ts';
+import { BigInt, Bytes } from '@graphprotocol/graph-ts';
 import {
     Allowed as AllowedEvent,
     MarkedAsPubliclyDecryptable as MarkedAsPubliclyDecryptableEvent,
     ViewerAdded as ViewerAddedEvent,
-} from '../generated/ACL/ACL';
+} from '../generated/NoxCompute/NoxCompute';
 import {
     Allowed,
     Handle,
@@ -21,6 +21,28 @@ function getOrCreateHandle(handleId: Bytes): Handle {
     return handle;
 }
 
+function createRole(
+    handle: Handle,
+    account: Bytes,
+    role: string,
+    grantedBy: Bytes,
+    txHash: Bytes,
+    logIndex: i32,
+    blockNumber: BigInt,
+    blockTimestamp: BigInt,
+): void {
+    const roleId = txHash.concatI32(logIndex);
+    const handleRole = new HandleRole(roleId);
+    handleRole.handle = handle.id;
+    handleRole.account = account;
+    handleRole.role = role;
+    handleRole.grantedBy = grantedBy;
+    handleRole.blockNumber = blockNumber;
+    handleRole.blockTimestamp = blockTimestamp;
+    handleRole.transactionHash = txHash;
+    handleRole.save();
+}
+
 export function handleAllowed(event: AllowedEvent): void {
     const entity = new Allowed(event.transaction.hash.concatI32(event.logIndex.toI32()));
     entity.sender = event.params.sender;
@@ -34,15 +56,16 @@ export function handleAllowed(event: AllowedEvent): void {
     entity.save();
 
     const handle = getOrCreateHandle(event.params.handle);
-    const role = new HandleRole(event.transaction.hash.concatI32(event.logIndex.toI32()));
-    role.handle = handle.id;
-    role.account = event.params.account;
-    role.role = 'ADMIN';
-    role.grantedBy = event.params.sender;
-    role.blockNumber = event.block.number;
-    role.blockTimestamp = event.block.timestamp;
-    role.transactionHash = event.transaction.hash;
-    role.save();
+    createRole(
+        handle,
+        event.params.account,
+        'ADMIN',
+        event.params.sender,
+        event.transaction.hash,
+        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
+    );
     handle.save();
 }
 
@@ -75,18 +98,15 @@ export function handleViewerAdded(event: ViewerAddedEvent): void {
     entity.save();
 
     const handle = getOrCreateHandle(event.params.handle);
-
-    // Create a HandleRole for the viewer
-    const roleId = event.transaction.hash.concatI32(event.logIndex.toI32());
-    const role = new HandleRole(roleId);
-    role.handle = handle.id;
-    role.account = event.params.viewer;
-    role.role = 'VIEWER';
-    role.grantedBy = event.params.sender;
-    role.blockNumber = event.block.number;
-    role.blockTimestamp = event.block.timestamp;
-    role.transactionHash = event.transaction.hash;
-    role.save();
-
+    createRole(
+        handle,
+        event.params.viewer,
+        'VIEWER',
+        event.params.sender,
+        event.transaction.hash,
+        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
+    );
     handle.save();
 }

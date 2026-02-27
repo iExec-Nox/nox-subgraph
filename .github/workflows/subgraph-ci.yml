@@ -1,0 +1,52 @@
+name: Subgraph - CI
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - '**/*.ts'
+      - '**/*.graphql'
+      - '**/*.yaml'
+      - '**/*.yml'
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version to use
+        required: false
+        type: number
+        default: 20
+
+concurrency:
+  group: ${{ github.ref }}-subgraph-ci
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check Format
+        run: npm run check-format || true
+
+      - name: Codegen
+        run: npm run codegen
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Build
+        run: npm run build

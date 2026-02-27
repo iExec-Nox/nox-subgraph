@@ -1,8 +1,8 @@
 {
-  "arbitrum-sepolia": {
-    "ACL": {
-      "address": "0xdc91ec3f965f2f5f143dbbfcc92cc1340857d3d1",
-      "startBlock": 0
+    "arbitrumSepolia": {
+        "ACL": {
+            "address": "0xdc91ec3f965f2f5f143dbbfcc92cc1340857d3d1",
+            "startBlock": 0
+        }
     }
-  }
 }
