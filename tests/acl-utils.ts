@@ -1,17 +1,18 @@
 import { Address, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts';
 import { newMockEvent } from 'matchstick-as';
-import {
-    Allowed,
-    Initialized,
-    MarkedAsPubliclyDecryptable,
-    NoxComputeUpdated,
-    OwnershipTransferred,
-    Upgraded,
-    ViewerAdded,
-} from '../generated/ACL/ACL';
+import { Allowed, MarkedAsPubliclyDecryptable, ViewerAdded } from '../generated/ACL/ACL';
 
-export function createAllowedEvent(sender: Address, account: Address, handle: Bytes): Allowed {
+export function createAllowedEvent(
+    sender: Address,
+    account: Address,
+    handle: Bytes,
+    logIndex: i32 = 0,
+): Allowed {
     const allowedEvent = changetype<Allowed>(newMockEvent());
+
+    // Set unique transaction hash and log index for each event
+    allowedEvent.transaction.hash = Bytes.fromI32(logIndex);
+    allowedEvent.logIndex = BigInt.fromI32(logIndex);
 
     allowedEvent.parameters = [];
 
@@ -28,24 +29,17 @@ export function createAllowedEvent(sender: Address, account: Address, handle: By
     return allowedEvent;
 }
 
-export function createInitializedEvent(version: BigInt): Initialized {
-    const initializedEvent = changetype<Initialized>(newMockEvent());
-
-    initializedEvent.parameters = [];
-
-    initializedEvent.parameters.push(
-        new ethereum.EventParam('version', ethereum.Value.fromUnsignedBigInt(version)),
-    );
-
-    return initializedEvent;
-}
-
 export function createMarkedAsPubliclyDecryptableEvent(
     sender: Address,
     handle: Bytes,
+    logIndex: i32 = 0,
 ): MarkedAsPubliclyDecryptable {
     const markedAsPubliclyDecryptableEvent =
         changetype<MarkedAsPubliclyDecryptable>(newMockEvent());
+
+    // Set unique transaction hash and log index for each event
+    markedAsPubliclyDecryptableEvent.transaction.hash = Bytes.fromI32(logIndex);
+    markedAsPubliclyDecryptableEvent.logIndex = BigInt.fromI32(logIndex);
 
     markedAsPubliclyDecryptableEvent.parameters = [];
 
@@ -59,54 +53,17 @@ export function createMarkedAsPubliclyDecryptableEvent(
     return markedAsPubliclyDecryptableEvent;
 }
 
-export function createNoxComputeUpdatedEvent(newNoxCompute: Address): NoxComputeUpdated {
-    const noxComputeUpdatedEvent = changetype<NoxComputeUpdated>(newMockEvent());
-
-    noxComputeUpdatedEvent.parameters = [];
-
-    noxComputeUpdatedEvent.parameters.push(
-        new ethereum.EventParam('newNoxCompute', ethereum.Value.fromAddress(newNoxCompute)),
-    );
-
-    return noxComputeUpdatedEvent;
-}
-
-export function createOwnershipTransferredEvent(
-    previousOwner: Address,
-    newOwner: Address,
-): OwnershipTransferred {
-    const ownershipTransferredEvent = changetype<OwnershipTransferred>(newMockEvent());
-
-    ownershipTransferredEvent.parameters = [];
-
-    ownershipTransferredEvent.parameters.push(
-        new ethereum.EventParam('previousOwner', ethereum.Value.fromAddress(previousOwner)),
-    );
-    ownershipTransferredEvent.parameters.push(
-        new ethereum.EventParam('newOwner', ethereum.Value.fromAddress(newOwner)),
-    );
-
-    return ownershipTransferredEvent;
-}
-
-export function createUpgradedEvent(implementation: Address): Upgraded {
-    const upgradedEvent = changetype<Upgraded>(newMockEvent());
-
-    upgradedEvent.parameters = [];
-
-    upgradedEvent.parameters.push(
-        new ethereum.EventParam('implementation', ethereum.Value.fromAddress(implementation)),
-    );
-
-    return upgradedEvent;
-}
-
 export function createViewerAddedEvent(
     sender: Address,
     viewer: Address,
     handle: Bytes,
+    logIndex: i32 = 0,
 ): ViewerAdded {
     const viewerAddedEvent = changetype<ViewerAdded>(newMockEvent());
+
+    // Set unique transaction hash and log index for each event
+    viewerAddedEvent.transaction.hash = Bytes.fromI32(logIndex);
+    viewerAddedEvent.logIndex = BigInt.fromI32(logIndex);
 
     viewerAddedEvent.parameters = [];
 

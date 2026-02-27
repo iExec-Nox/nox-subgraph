@@ -5,11 +5,11 @@ schema:
     file: ./schema.graphql
 dataSources:
     - kind: ethereum
-      name: ACL
-      network: arbitrumSepolia
+      name: NoxCompute
+      network: arbitrum-sepolia
       source:
-          address: '0xdc91ec3f965f2f5f143dbbfcc92cc1340857d3d1'
-          abi: ACL
+          address: '0x1F00Ab5bd16eeFFF270d24a6C4f31964010F2CE4'
+          abi: NoxCompute
           startBlock: 234946800
 
       mapping:
@@ -18,28 +18,16 @@ dataSources:
           language: wasm/assemblyscript
           entities:
               - Allowed
-              - Initialized
               - MarkedAsPubliclyDecryptable
-              - NoxComputeUpdated
-              - OwnershipTransferred
-              - Upgraded
               - ViewerAdded
           abis:
-              - name: ACL
-                file: ./abis/ACL.json
+              - name: NoxCompute
+                file: ./abis/NoxCompute.json
           eventHandlers:
               - event: Allowed(indexed address,indexed address,indexed bytes32)
                 handler: handleAllowed
-              - event: Initialized(uint64)
-                handler: handleInitialized
               - event: MarkedAsPubliclyDecryptable(indexed address,indexed bytes32)
                 handler: handleMarkedAsPubliclyDecryptable
-              - event: NoxComputeUpdated(indexed address)
-                handler: handleNoxComputeUpdated
-              - event: OwnershipTransferred(indexed address,indexed address)
-                handler: handleOwnershipTransferred
-              - event: Upgraded(indexed address)
-                handler: handleUpgraded
               - event: ViewerAdded(indexed address,indexed address,indexed bytes32)
                 handler: handleViewerAdded
-          file: ./src/acl.ts
+          file: ./src/NoxCompute.ts
