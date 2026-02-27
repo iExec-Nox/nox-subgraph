@@ -24,7 +24,8 @@
         "all": "npm run codegen && npm run build && npm run test",
         "format": "prettier --write \"(src|tests)/**/*.{js,ts}\"",
         "check-format": "prettier --check \"(src|tests)/**/*.{js,ts}\"",
-        "test": "graph test"
+        "test": "npm run clean && npm run codegen && npm run build && graph test",
+        "clean": "rm -rf generated && rm -rf build"
     },
     "lint-staged": {
         "*.{js,ts}": [
