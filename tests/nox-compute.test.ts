@@ -9,7 +9,7 @@ import {
     createAllowedEvent,
     createMarkedAsPubliclyDecryptableEvent,
     createViewerAddedEvent,
-} from './acl-utils';
+} from './nox-compute-utils';
 
 const handleId = Bytes.fromI32(1_234_567_890);
 const sender1 = Address.fromString('0x0000000000000000000000000000000000000001');
