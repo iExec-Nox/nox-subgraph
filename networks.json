@@ -1,5 +1,5 @@
 {
-    "arbitrumSepolia": {
+    "arbitrum-sepolia": {
         "NoxCompute": {
             "address": "0x5633472D35E18464CA24Ab974954fB3b1B122eA6",
             "startBlock": 245719666
