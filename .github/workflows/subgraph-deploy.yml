@@ -6,10 +6,10 @@ on:
       environment:
         description: 'Deployment environment (must match a GitHub Environment name)'
         required: true
-        default: arbitrumSepolia
+        default: arbitrum-sepolia
         type: choice
         options:
-          - arbitrumSepolia
+          - arbitrum-sepolia
           - arbitrum
 
 jobs:
@@ -40,7 +40,7 @@ jobs:
       - name: Set Version Label
         id: set_version
         run: |
-          if [[ "${{ github.event.inputs.environment }}" == "arbitrumSepolia" ]]; then
+          if [[ "${{ github.event.inputs.environment }}" == "arbitrum-sepolia" ]]; then
             echo "version=${GITHUB_SHA}" >> $GITHUB_OUTPUT
           else
             version=$(npm pkg get version | sed 's/"//g')
