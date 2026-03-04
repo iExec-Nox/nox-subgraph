@@ -1,8 +1,8 @@
 {
     "arbitrumSepolia": {
-        "ACL": {
-            "address": "0xdc91ec3f965f2f5f143dbbfcc92cc1340857d3d1",
-            "startBlock": 0
+        "NoxCompute": {
+            "address": "0x5633472D35E18464CA24Ab974954fB3b1B122eA6",
+            "startBlock": 245719666
         }
     }
 }
