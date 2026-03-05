@@ -4,19 +4,14 @@ import {
     MarkedAsPubliclyDecryptable as MarkedAsPubliclyDecryptableEvent,
     ViewerAdded as ViewerAddedEvent,
 } from '../generated/NoxCompute/NoxCompute';
-import {
-    Allowed,
-    Handle,
-    HandleRole,
-    MarkedAsPubliclyDecryptable,
-    ViewerAdded,
-} from '../generated/schema';
+import { Handle, HandleRole } from '../generated/schema';
 
 function getOrCreateHandle(handleId: Bytes): Handle {
     let handle = Handle.load(handleId);
     if (handle == null) {
         handle = new Handle(handleId);
         handle.isPubliclyDecryptable = false;
+        handle.save();
     }
     return handle;
 }
@@ -44,17 +39,6 @@ function createRole(
 }
 
 export function handleAllowed(event: AllowedEvent): void {
-    const entity = new Allowed(event.transaction.hash.concatI32(event.logIndex.toI32()));
-    entity.sender = event.params.sender;
-    entity.account = event.params.account;
-    entity.handle = event.params.handle;
-
-    entity.blockNumber = event.block.number;
-    entity.blockTimestamp = event.block.timestamp;
-    entity.transactionHash = event.transaction.hash;
-
-    entity.save();
-
     const handle = getOrCreateHandle(event.params.handle);
     createRole(
         handle,
@@ -70,33 +54,12 @@ export function handleAllowed(event: AllowedEvent): void {
 }
 
 export function handleMarkedAsPubliclyDecryptable(event: MarkedAsPubliclyDecryptableEvent): void {
-    const entity = new MarkedAsPubliclyDecryptable(
-        event.transaction.hash.concatI32(event.logIndex.toI32()),
-    );
-    entity.sender = event.params.sender;
-    entity.handle = event.params.handle;
-
-    entity.blockNumber = event.block.number;
-    entity.blockTimestamp = event.block.timestamp;
-    entity.transactionHash = event.transaction.hash;
-
-    entity.save();
-
     const handle = getOrCreateHandle(event.params.handle);
     handle.isPubliclyDecryptable = true;
     handle.save();
 }
 
 export function handleViewerAdded(event: ViewerAddedEvent): void {
-    const entity = new ViewerAdded(event.transaction.hash.concatI32(event.logIndex.toI32()));
-    entity.sender = event.params.sender;
-    entity.viewer = event.params.viewer;
-    entity.handle = event.params.handle;
-    entity.blockNumber = event.block.number;
-    entity.blockTimestamp = event.block.timestamp;
-    entity.transactionHash = event.transaction.hash;
-    entity.save();
-
     const handle = getOrCreateHandle(event.params.handle);
     createRole(
         handle,
