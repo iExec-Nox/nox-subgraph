@@ -9,9 +9,6 @@
     "homepage": "https://github.com/iExec-Nox/nox-subgraph#readme",
     "bugs": "https://github.com/iExec-Nox/nox-subgraph/issues",
     "license": "Apache-2.0",
-    "engines": {
-        "node": ">=18.0.0"
-    },
     "scripts": {
         "prepare": "husky",
         "codegen": "graph codegen",
