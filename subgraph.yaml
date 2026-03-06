@@ -17,9 +17,8 @@ dataSources:
           apiVersion: 0.0.9
           language: wasm/assemblyscript
           entities:
-              - Allowed
-              - MarkedAsPubliclyDecryptable
-              - ViewerAdded
+              - Handle
+              - HandleRole
           abis:
               - name: NoxCompute
                 file: ./abis/NoxCompute.json
