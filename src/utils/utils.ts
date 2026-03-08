@@ -1,5 +1,5 @@
 import { BigInt, Bytes } from '@graphprotocol/graph-ts';
-import { Handle, HandleRole } from '../../generated/schema';
+import { Handle, HandleRole, Operation } from '../../generated/schema';
 
 export function getOrCreateHandle(handleId: Bytes): Handle {
     let handle = Handle.load(handleId);
@@ -9,6 +9,60 @@ export function getOrCreateHandle(handleId: Bytes): Handle {
         handle.save();
     }
     return handle;
+}
+
+export function createOperation(
+    operator: string,
+    operandIds: Bytes[],
+    outputIds: Bytes[],
+    txHash: Bytes,
+    logIndex: i32,
+): void {
+    for (let i = 0; i < operandIds.length; i++) {
+        getOrCreateHandle(operandIds[i]);
+    }
+
+    const operationId = txHash.concatI32(logIndex);
+    const operation = new Operation(operationId);
+    operation.operator = operator;
+    operation.operands = operandIds;
+    operation.transactionHash = txHash;
+    operation.save();
+
+    for (let i = 0; i < outputIds.length; i++) {
+        let output = Handle.load(outputIds[i]);
+        if (output == null) {
+            output = new Handle(outputIds[i]);
+            output.isPubliclyDecryptable = false;
+        }
+        output.operation = operationId;
+        output.save();
+    }
+}
+
+export function createPlaintextOperation(
+    plaintext: Bytes,
+    outputIds: Bytes[],
+    txHash: Bytes,
+    logIndex: i32,
+): void {
+    const operationId = txHash.concatI32(logIndex);
+    const operation = new Operation(operationId);
+    operation.operator = 'PlaintextToEncrypted';
+    operation.operands = new Array<Bytes>(0);
+    operation.plaintext = plaintext;
+    operation.transactionHash = txHash;
+    operation.save();
+
+    for (let i = 0; i < outputIds.length; i++) {
+        let output = Handle.load(outputIds[i]);
+        if (output == null) {
+            output = new Handle(outputIds[i]);
+            output.isPubliclyDecryptable = false;
+        }
+        output.operation = operationId;
+        output.save();
+    }
 }
 
 export function createRole(
