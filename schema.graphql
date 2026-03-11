@@ -1,25 +1,3 @@
-enum Operator {
-  PlaintextToEncrypted
-  Add
-  Sub
-  Mul
-  Div
-  SafeAdd
-  SafeSub
-  SafeMul
-  SafeDiv
-  Eq
-  Ne
-  Lt
-  Le
-  Gt
-  Ge
-  Select
-  Transfer
-  Mint
-  Burn
-}
-
 enum Role {
   ADMIN
   VIEWER
@@ -28,17 +6,12 @@ enum Role {
 type Handle @entity(immutable: false) {
   id: Bytes!
   isPubliclyDecryptable: Boolean!
-  operation: Operation
-  roles: [HandleRole!]! @derivedFrom(field: "handle")
-}
-
-type Operation @entity(immutable: true) {
-  id: Bytes! # txHash + logIndex
-  operator: Operator!
-  operands: [Handle!]!
-  outputs: [Handle!]! @derivedFrom(field: "operation")
   plaintext: Bytes
-  transactionHash: Bytes!
+  operator: String!
+  parentHandles: [Handle!]!
+  childHandles: [Handle!]!
+  roles: [HandleRole!]! @derivedFrom(field: "handle")
+  transactionHash: Bytes
 }
 
 type HandleRole @entity(immutable: true) {

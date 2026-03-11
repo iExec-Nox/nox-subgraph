@@ -67,16 +67,12 @@ const output2 = Bytes.fromI32(602);
 const output3 = Bytes.fromI32(603);
 const caller1 = Address.fromString('0x0000000000000000000000000000000000000010');
 
-function operandsString(ops: Bytes[]): string {
+function handleIdsString(ids: Bytes[]): string {
     const parts: string[] = [];
-    for (let i = 0; i < ops.length; i++) {
-        parts.push(ops[i].toHexString());
+    for (let i = 0; i < ids.length; i++) {
+        parts.push(ids[i].toHexString());
     }
     return '[' + parts.join(', ') + ']';
-}
-
-function getOperationId(logIndex: i32): Bytes {
-    return Bytes.fromI32(logIndex).concatI32(logIndex);
 }
 
 describe('Handle Entity Tests', () => {
@@ -102,7 +98,6 @@ describe('Handle Entity Tests', () => {
             const event = createAllowedEvent(sender1, account1, handleId);
             handleAllowed(event);
 
-            // Get the role ID (transaction hash + log index)
             const roleId = event.transaction.hash.concatI32(event.logIndex.toI32());
             const roleIdHex = roleId.toHexString();
 
@@ -141,7 +136,6 @@ describe('Handle Entity Tests', () => {
             handleAllowed(event1);
             handleAllowed(event2);
 
-            // Both events create separate HandleRole entities (historical record)
             assert.entityCount('Handle', 1);
             assert.entityCount('HandleRole', 2);
         });
@@ -269,21 +263,17 @@ describe('PlaintextToEncrypted Tests', () => {
         clearStore();
     });
 
-    test('PlaintextToEncrypted creates Operation with plaintext and output Handle', () => {
+    test('PlaintextToEncrypted creates Handle with plaintext and operator', () => {
         clearStore();
         const event = createPlaintextToEncryptedEvent(caller1, plaintextValue, 4, resultHandle);
         handlePlaintextToEncrypted(event);
 
         assert.entityCount('Handle', 1);
-        assert.entityCount('Operation', 1);
-
-        const opId = getOperationId(0).toHexString();
-        assert.fieldEquals('Operation', opId, 'operator', 'PlaintextToEncrypted');
-        assert.fieldEquals('Operation', opId, 'plaintext', plaintextValue.toHexString());
-        assert.fieldEquals('Operation', opId, 'operands', '[]');
 
         const resultHex = resultHandle.toHexString();
-        assert.fieldEquals('Handle', resultHex, 'operation', opId);
+        assert.fieldEquals('Handle', resultHex, 'operator', 'PlaintextToEncrypted');
+        assert.fieldEquals('Handle', resultHex, 'plaintext', plaintextValue.toHexString());
+        assert.fieldEquals('Handle', resultHex, 'parentHandles', '[]');
         assert.fieldEquals('Handle', resultHex, 'isPubliclyDecryptable', 'false');
     });
 
@@ -301,9 +291,12 @@ describe('PlaintextToEncrypted Tests', () => {
         const allowedEvent = createAllowedEvent(sender1, account1, resultHandle, 2);
         handleAllowed(allowedEvent);
 
-        const opId = getOperationId(1).toHexString();
-        assert.fieldEquals('Operation', opId, 'operator', 'PlaintextToEncrypted');
-        assert.fieldEquals('Handle', resultHandle.toHexString(), 'operation', opId);
+        assert.fieldEquals(
+            'Handle',
+            resultHandle.toHexString(),
+            'operator',
+            'PlaintextToEncrypted',
+        );
         assert.entityCount('HandleRole', 1);
     });
 
@@ -315,19 +308,14 @@ describe('PlaintextToEncrypted Tests', () => {
         const addEvent = createAddEvent(caller1, leftOperand, rightOperand, resultHandle, 2);
         handleAdd(addEvent);
 
-        const ptOpId = getOperationId(1).toHexString();
-        assert.fieldEquals('Operation', ptOpId, 'operator', 'PlaintextToEncrypted');
-        assert.fieldEquals('Handle', leftOperand.toHexString(), 'operation', ptOpId);
-
-        const addOpId = getOperationId(2).toHexString();
-        assert.fieldEquals('Operation', addOpId, 'operator', 'Add');
+        assert.fieldEquals('Handle', leftOperand.toHexString(), 'operator', 'PlaintextToEncrypted');
+        assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'Add');
         assert.fieldEquals(
-            'Operation',
-            addOpId,
-            'operands',
-            operandsString([leftOperand, rightOperand]),
+            'Handle',
+            resultHandle.toHexString(),
+            'parentHandles',
+            handleIdsString([leftOperand, rightOperand]),
         );
-        assert.fieldEquals('Handle', resultHandle.toHexString(), 'operation', addOpId);
     });
 });
 
@@ -339,26 +327,24 @@ describe('Handle Lineage Tests', () => {
     });
 
     describe('Add Operation', () => {
-        test('Add creates Operation with operands and output Handle', () => {
+        test('Add creates output Handle with correct operator and parents', () => {
             clearStore();
             const event = createAddEvent(caller1, leftOperand, rightOperand, resultHandle);
             handleAdd(event);
 
             assert.entityCount('Handle', 3);
-            assert.entityCount('Operation', 1);
 
-            const opId = getOperationId(0).toHexString();
-            assert.fieldEquals('Operation', opId, 'operator', 'Add');
+            const resultHex = resultHandle.toHexString();
+            assert.fieldEquals('Handle', resultHex, 'operator', 'Add');
             assert.fieldEquals(
-                'Operation',
-                opId,
-                'operands',
-                operandsString([leftOperand, rightOperand]),
+                'Handle',
+                resultHex,
+                'parentHandles',
+                handleIdsString([leftOperand, rightOperand]),
             );
-            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operation', opId);
         });
 
-        test('Add operand handles are created without operation', () => {
+        test('Add operand handles are created with empty operator', () => {
             clearStore();
             const event = createAddEvent(caller1, leftOperand, rightOperand, resultHandle);
             handleAdd(event);
@@ -369,129 +355,145 @@ describe('Handle Lineage Tests', () => {
                 'isPubliclyDecryptable',
                 'false',
             );
+            assert.fieldEquals('Handle', leftOperand.toHexString(), 'operator', '');
             assert.fieldEquals(
                 'Handle',
                 rightOperand.toHexString(),
                 'isPubliclyDecryptable',
                 'false',
             );
+            assert.fieldEquals('Handle', rightOperand.toHexString(), 'operator', '');
+        });
+
+        test('Add updates parent childHandles', () => {
+            clearStore();
+            const event = createAddEvent(caller1, leftOperand, rightOperand, resultHandle);
+            handleAdd(event);
+
+            assert.fieldEquals(
+                'Handle',
+                leftOperand.toHexString(),
+                'childHandles',
+                handleIdsString([resultHandle]),
+            );
+            assert.fieldEquals(
+                'Handle',
+                rightOperand.toHexString(),
+                'childHandles',
+                handleIdsString([resultHandle]),
+            );
         });
     });
 
     describe('Sub Operation', () => {
-        test('Sub creates Operation with correct operands', () => {
+        test('Sub creates Handle with correct operator and parents', () => {
             clearStore();
             const event = createSubEvent(caller1, leftOperand, rightOperand, resultHandle);
             handleSub(event);
 
             assert.entityCount('Handle', 3);
-            const opId = getOperationId(0).toHexString();
-            assert.fieldEquals('Operation', opId, 'operator', 'Sub');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'Sub');
             assert.fieldEquals(
-                'Operation',
-                opId,
-                'operands',
-                operandsString([leftOperand, rightOperand]),
+                'Handle',
+                resultHandle.toHexString(),
+                'parentHandles',
+                handleIdsString([leftOperand, rightOperand]),
             );
-            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operation', opId);
         });
     });
 
     describe('Mul Operation', () => {
-        test('Mul creates Operation with correct operands', () => {
+        test('Mul creates Handle with correct operator and parents', () => {
             clearStore();
             const event = createMulEvent(caller1, leftOperand, rightOperand, resultHandle);
             handleMul(event);
 
             assert.entityCount('Handle', 3);
-            const opId = getOperationId(0).toHexString();
-            assert.fieldEquals('Operation', opId, 'operator', 'Mul');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'Mul');
             assert.fieldEquals(
-                'Operation',
-                opId,
-                'operands',
-                operandsString([leftOperand, rightOperand]),
+                'Handle',
+                resultHandle.toHexString(),
+                'parentHandles',
+                handleIdsString([leftOperand, rightOperand]),
             );
         });
     });
 
     describe('Div Operation', () => {
-        test('Div creates Operation with correct operands', () => {
+        test('Div creates Handle with correct operator and parents', () => {
             clearStore();
             const event = createDivEvent(caller1, leftOperand, rightOperand, resultHandle);
             handleDiv(event);
 
             assert.entityCount('Handle', 3);
-            const opId = getOperationId(0).toHexString();
-            assert.fieldEquals('Operation', opId, 'operator', 'Div');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'Div');
             assert.fieldEquals(
-                'Operation',
-                opId,
-                'operands',
-                operandsString([leftOperand, rightOperand]),
+                'Handle',
+                resultHandle.toHexString(),
+                'parentHandles',
+                handleIdsString([leftOperand, rightOperand]),
             );
         });
     });
 
     describe('Comparison Operations', () => {
-        test('Eq creates Operation with correct operands', () => {
+        test('Eq creates Handle with correct operator and parents', () => {
             clearStore();
             const event = createEqEvent(caller1, leftOperand, rightOperand, resultHandle);
             handleEq(event);
 
-            const opId = getOperationId(0).toHexString();
-            assert.fieldEquals('Operation', opId, 'operator', 'Eq');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'Eq');
             assert.fieldEquals(
-                'Operation',
-                opId,
-                'operands',
-                operandsString([leftOperand, rightOperand]),
+                'Handle',
+                resultHandle.toHexString(),
+                'parentHandles',
+                handleIdsString([leftOperand, rightOperand]),
             );
         });
 
-        test('Ne creates Operation with correct operator', () => {
+        test('Ne creates Handle with correct operator', () => {
             clearStore();
             const event = createNeEvent(caller1, leftOperand, rightOperand, resultHandle);
             handleNe(event);
 
-            assert.fieldEquals('Operation', getOperationId(0).toHexString(), 'operator', 'Ne');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'Ne');
         });
 
-        test('Lt creates Operation with correct operator', () => {
+        test('Lt creates Handle with correct operator', () => {
             clearStore();
             const event = createLtEvent(caller1, leftOperand, rightOperand, resultHandle);
             handleLt(event);
 
-            assert.fieldEquals('Operation', getOperationId(0).toHexString(), 'operator', 'Lt');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'Lt');
         });
 
-        test('Le creates Operation with correct operator', () => {
+        test('Le creates Handle with correct operator', () => {
             clearStore();
             const event = createLeEvent(caller1, leftOperand, rightOperand, resultHandle);
             handleLe(event);
 
-            assert.fieldEquals('Operation', getOperationId(0).toHexString(), 'operator', 'Le');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'Le');
         });
 
-        test('Gt creates Operation with correct operator', () => {
+        test('Gt creates Handle with correct operator', () => {
             clearStore();
             const event = createGtEvent(caller1, leftOperand, rightOperand, resultHandle);
             handleGt(event);
 
-            assert.fieldEquals('Operation', getOperationId(0).toHexString(), 'operator', 'Gt');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'Gt');
         });
 
-        test('Ge creates Operation with correct operator', () => {
+        test('Ge creates Handle with correct operator', () => {
             clearStore();
             const event = createGeEvent(caller1, leftOperand, rightOperand, resultHandle);
             handleGe(event);
 
-            assert.fieldEquals('Operation', getOperationId(0).toHexString(), 'operator', 'Ge');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'Ge');
         });
     });
 
     describe('Safe Operations', () => {
-        test('SafeAdd creates one Operation with two output handles', () => {
+        test('SafeAdd creates two output handles with same operator and parents', () => {
             clearStore();
             const event = createSafeAddEvent(
                 caller1,
@@ -503,21 +505,15 @@ describe('Handle Lineage Tests', () => {
             handleSafeAdd(event);
 
             assert.entityCount('Handle', 4);
-            assert.entityCount('Operation', 1);
 
-            const opId = getOperationId(0).toHexString();
-            assert.fieldEquals('Operation', opId, 'operator', 'SafeAdd');
-            assert.fieldEquals(
-                'Operation',
-                opId,
-                'operands',
-                operandsString([leftOperand, rightOperand]),
-            );
-            assert.fieldEquals('Handle', successHandle.toHexString(), 'operation', opId);
-            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operation', opId);
+            const parents = handleIdsString([leftOperand, rightOperand]);
+            assert.fieldEquals('Handle', successHandle.toHexString(), 'operator', 'SafeAdd');
+            assert.fieldEquals('Handle', successHandle.toHexString(), 'parentHandles', parents);
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'SafeAdd');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'parentHandles', parents);
         });
 
-        test('SafeSub creates one Operation with two output handles', () => {
+        test('SafeSub creates two output handles with same operator', () => {
             clearStore();
             const event = createSafeSubEvent(
                 caller1,
@@ -528,14 +524,11 @@ describe('Handle Lineage Tests', () => {
             );
             handleSafeSub(event);
 
-            assert.entityCount('Operation', 1);
-            const opId = getOperationId(0).toHexString();
-            assert.fieldEquals('Operation', opId, 'operator', 'SafeSub');
-            assert.fieldEquals('Handle', successHandle.toHexString(), 'operation', opId);
-            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operation', opId);
+            assert.fieldEquals('Handle', successHandle.toHexString(), 'operator', 'SafeSub');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'SafeSub');
         });
 
-        test('SafeMul creates one Operation with two output handles', () => {
+        test('SafeMul creates two output handles with same operator', () => {
             clearStore();
             const event = createSafeMulEvent(
                 caller1,
@@ -546,14 +539,11 @@ describe('Handle Lineage Tests', () => {
             );
             handleSafeMul(event);
 
-            assert.entityCount('Operation', 1);
-            const opId = getOperationId(0).toHexString();
-            assert.fieldEquals('Operation', opId, 'operator', 'SafeMul');
-            assert.fieldEquals('Handle', successHandle.toHexString(), 'operation', opId);
-            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operation', opId);
+            assert.fieldEquals('Handle', successHandle.toHexString(), 'operator', 'SafeMul');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'SafeMul');
         });
 
-        test('SafeDiv creates one Operation with two output handles', () => {
+        test('SafeDiv creates two output handles with same operator', () => {
             clearStore();
             const event = createSafeDivEvent(
                 caller1,
@@ -564,11 +554,8 @@ describe('Handle Lineage Tests', () => {
             );
             handleSafeDiv(event);
 
-            assert.entityCount('Operation', 1);
-            const opId = getOperationId(0).toHexString();
-            assert.fieldEquals('Operation', opId, 'operator', 'SafeDiv');
-            assert.fieldEquals('Handle', successHandle.toHexString(), 'operation', opId);
-            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operation', opId);
+            assert.fieldEquals('Handle', successHandle.toHexString(), 'operator', 'SafeDiv');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'SafeDiv');
         });
     });
 
@@ -581,20 +568,18 @@ describe('Handle Lineage Tests', () => {
             const allowedEvent = createAllowedEvent(sender1, account1, resultHandle, 2);
             handleAllowed(allowedEvent);
 
-            const opId = getOperationId(1).toHexString();
-            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operation', opId);
-            assert.fieldEquals('Operation', opId, 'operator', 'Add');
+            assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'Add');
             assert.entityCount('HandleRole', 1);
         });
 
-        test('Handle without operation has no operation field', () => {
+        test('Handle created from ACL event has empty operator', () => {
             clearStore();
             const event = createAllowedEvent(sender1, account1, handleId);
             handleAllowed(event);
 
             assert.fieldEquals('Handle', handleId.toHexString(), 'isPubliclyDecryptable', 'false');
+            assert.fieldEquals('Handle', handleId.toHexString(), 'operator', '');
             assert.entityCount('Handle', 1);
-            assert.entityCount('Operation', 0);
         });
 
         test('Chained operations: result of Add used as operand of Mul', () => {
@@ -619,28 +604,25 @@ describe('Handle Lineage Tests', () => {
             );
             handleMul(mulEvent);
 
-            const addOpId = getOperationId(1).toHexString();
-            assert.fieldEquals('Operation', addOpId, 'operator', 'Add');
+            // Add output
+            assert.fieldEquals('Handle', intermediateResult.toHexString(), 'operator', 'Add');
             assert.fieldEquals(
-                'Operation',
-                addOpId,
-                'operands',
-                operandsString([leftOperand, rightOperand]),
+                'Handle',
+                intermediateResult.toHexString(),
+                'parentHandles',
+                handleIdsString([leftOperand, rightOperand]),
             );
-            assert.fieldEquals('Handle', intermediateResult.toHexString(), 'operation', addOpId);
 
-            const mulOpId = getOperationId(2).toHexString();
-            assert.fieldEquals('Operation', mulOpId, 'operator', 'Mul');
+            // Mul output
+            assert.fieldEquals('Handle', finalResult.toHexString(), 'operator', 'Mul');
             assert.fieldEquals(
-                'Operation',
-                mulOpId,
-                'operands',
-                operandsString([intermediateResult, rightOperand]),
+                'Handle',
+                finalResult.toHexString(),
+                'parentHandles',
+                handleIdsString([intermediateResult, rightOperand]),
             );
-            assert.fieldEquals('Handle', finalResult.toHexString(), 'operation', mulOpId);
 
             assert.entityCount('Handle', 4);
-            assert.entityCount('Operation', 2);
         });
     });
 });
@@ -652,7 +634,7 @@ describe('Select Operation Tests', () => {
         clearStore();
     });
 
-    test('Select creates Operation with 3 operands', () => {
+    test('Select creates Handle with 3 parents', () => {
         clearStore();
         const condition = Bytes.fromI32(10);
         const ifTrue = Bytes.fromI32(20);
@@ -661,17 +643,15 @@ describe('Select Operation Tests', () => {
         handleSelect(event);
 
         assert.entityCount('Handle', 4);
-        assert.entityCount('Operation', 1);
 
-        const opId = getOperationId(0).toHexString();
-        assert.fieldEquals('Operation', opId, 'operator', 'Select');
+        const resultHex = resultHandle.toHexString();
+        assert.fieldEquals('Handle', resultHex, 'operator', 'Select');
         assert.fieldEquals(
-            'Operation',
-            opId,
-            'operands',
-            operandsString([condition, ifTrue, ifFalse]),
+            'Handle',
+            resultHex,
+            'parentHandles',
+            handleIdsString([condition, ifTrue, ifFalse]),
         );
-        assert.fieldEquals('Handle', resultHandle.toHexString(), 'operation', opId);
     });
 });
 
@@ -683,7 +663,7 @@ describe('Composite Operation Tests', () => {
     });
 
     describe('Transfer', () => {
-        test('Transfer creates one Operation with 3 inputs and 3 outputs', () => {
+        test('Transfer creates 3 output handles with 3 parents', () => {
             clearStore();
             const event = createTransferEvent(
                 caller1,
@@ -697,24 +677,19 @@ describe('Composite Operation Tests', () => {
             handleTransfer(event);
 
             assert.entityCount('Handle', 6);
-            assert.entityCount('Operation', 1);
 
-            const opId = getOperationId(0).toHexString();
-            assert.fieldEquals('Operation', opId, 'operator', 'Transfer');
-            assert.fieldEquals(
-                'Operation',
-                opId,
-                'operands',
-                operandsString([leftOperand, rightOperand, thirdOperand]),
-            );
-            assert.fieldEquals('Handle', output1.toHexString(), 'operation', opId);
-            assert.fieldEquals('Handle', output2.toHexString(), 'operation', opId);
-            assert.fieldEquals('Handle', output3.toHexString(), 'operation', opId);
+            const parents = handleIdsString([leftOperand, rightOperand, thirdOperand]);
+            assert.fieldEquals('Handle', output1.toHexString(), 'operator', 'Transfer');
+            assert.fieldEquals('Handle', output1.toHexString(), 'parentHandles', parents);
+            assert.fieldEquals('Handle', output2.toHexString(), 'operator', 'Transfer');
+            assert.fieldEquals('Handle', output2.toHexString(), 'parentHandles', parents);
+            assert.fieldEquals('Handle', output3.toHexString(), 'operator', 'Transfer');
+            assert.fieldEquals('Handle', output3.toHexString(), 'parentHandles', parents);
         });
     });
 
     describe('Mint', () => {
-        test('Mint creates one Operation with 3 inputs and 3 outputs', () => {
+        test('Mint creates 3 output handles with 3 parents', () => {
             clearStore();
             const event = createMintEvent(
                 caller1,
@@ -728,24 +703,19 @@ describe('Composite Operation Tests', () => {
             handleMint(event);
 
             assert.entityCount('Handle', 6);
-            assert.entityCount('Operation', 1);
 
-            const opId = getOperationId(0).toHexString();
-            assert.fieldEquals('Operation', opId, 'operator', 'Mint');
-            assert.fieldEquals(
-                'Operation',
-                opId,
-                'operands',
-                operandsString([leftOperand, rightOperand, thirdOperand]),
-            );
-            assert.fieldEquals('Handle', output1.toHexString(), 'operation', opId);
-            assert.fieldEquals('Handle', output2.toHexString(), 'operation', opId);
-            assert.fieldEquals('Handle', output3.toHexString(), 'operation', opId);
+            const parents = handleIdsString([leftOperand, rightOperand, thirdOperand]);
+            assert.fieldEquals('Handle', output1.toHexString(), 'operator', 'Mint');
+            assert.fieldEquals('Handle', output1.toHexString(), 'parentHandles', parents);
+            assert.fieldEquals('Handle', output2.toHexString(), 'operator', 'Mint');
+            assert.fieldEquals('Handle', output2.toHexString(), 'parentHandles', parents);
+            assert.fieldEquals('Handle', output3.toHexString(), 'operator', 'Mint');
+            assert.fieldEquals('Handle', output3.toHexString(), 'parentHandles', parents);
         });
     });
 
     describe('Burn', () => {
-        test('Burn creates one Operation with 3 inputs and 3 outputs', () => {
+        test('Burn creates 3 output handles with 3 parents', () => {
             clearStore();
             const event = createBurnEvent(
                 caller1,
@@ -759,19 +729,14 @@ describe('Composite Operation Tests', () => {
             handleBurn(event);
 
             assert.entityCount('Handle', 6);
-            assert.entityCount('Operation', 1);
 
-            const opId = getOperationId(0).toHexString();
-            assert.fieldEquals('Operation', opId, 'operator', 'Burn');
-            assert.fieldEquals(
-                'Operation',
-                opId,
-                'operands',
-                operandsString([leftOperand, rightOperand, thirdOperand]),
-            );
-            assert.fieldEquals('Handle', output1.toHexString(), 'operation', opId);
-            assert.fieldEquals('Handle', output2.toHexString(), 'operation', opId);
-            assert.fieldEquals('Handle', output3.toHexString(), 'operation', opId);
+            const parents = handleIdsString([leftOperand, rightOperand, thirdOperand]);
+            assert.fieldEquals('Handle', output1.toHexString(), 'operator', 'Burn');
+            assert.fieldEquals('Handle', output1.toHexString(), 'parentHandles', parents);
+            assert.fieldEquals('Handle', output2.toHexString(), 'operator', 'Burn');
+            assert.fieldEquals('Handle', output2.toHexString(), 'parentHandles', parents);
+            assert.fieldEquals('Handle', output3.toHexString(), 'operator', 'Burn');
+            assert.fieldEquals('Handle', output3.toHexString(), 'parentHandles', parents);
         });
     });
 });

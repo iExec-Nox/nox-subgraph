@@ -1,11 +1,14 @@
 import { BigInt, Bytes } from '@graphprotocol/graph-ts';
-import { Handle, HandleRole, Operation } from '../../generated/schema';
+import { Handle, HandleRole } from '../../generated/schema';
 
 export function getOrCreateHandle(handleId: Bytes): Handle {
     let handle = Handle.load(handleId);
     if (handle == null) {
         handle = new Handle(handleId);
         handle.isPubliclyDecryptable = false;
+        handle.operator = '';
+        handle.parentHandles = new Array<Bytes>(0);
+        handle.childHandles = new Array<Bytes>(0);
         handle.save();
     }
     return handle;
@@ -22,21 +25,29 @@ export function createOperation(
         getOrCreateHandle(operandIds[i]);
     }
 
-    const operationId = txHash.concatI32(logIndex);
-    const operation = new Operation(operationId);
-    operation.operator = operator;
-    operation.operands = operandIds;
-    operation.transactionHash = txHash;
-    operation.save();
-
     for (let i = 0; i < outputIds.length; i++) {
         let output = Handle.load(outputIds[i]);
         if (output == null) {
             output = new Handle(outputIds[i]);
             output.isPubliclyDecryptable = false;
+            output.childHandles = new Array<Bytes>(0);
         }
-        output.operation = operationId;
+        output.operator = operator;
+        output.parentHandles = operandIds;
+        output.transactionHash = txHash;
         output.save();
+    }
+
+    for (let i = 0; i < operandIds.length; i++) {
+        let parent = Handle.load(operandIds[i]);
+        if (parent != null) {
+            let children = parent.childHandles;
+            for (let j = 0; j < outputIds.length; j++) {
+                children.push(outputIds[j]);
+            }
+            parent.childHandles = children;
+            parent.save();
+        }
     }
 }
 
@@ -46,21 +57,17 @@ export function createPlaintextOperation(
     txHash: Bytes,
     logIndex: i32,
 ): void {
-    const operationId = txHash.concatI32(logIndex);
-    const operation = new Operation(operationId);
-    operation.operator = 'PlaintextToEncrypted';
-    operation.operands = new Array<Bytes>(0);
-    operation.plaintext = plaintext;
-    operation.transactionHash = txHash;
-    operation.save();
-
     for (let i = 0; i < outputIds.length; i++) {
         let output = Handle.load(outputIds[i]);
         if (output == null) {
             output = new Handle(outputIds[i]);
             output.isPubliclyDecryptable = false;
+            output.childHandles = new Array<Bytes>(0);
         }
-        output.operation = operationId;
+        output.operator = 'PlaintextToEncrypted';
+        output.parentHandles = new Array<Bytes>(0);
+        output.plaintext = plaintext;
+        output.transactionHash = txHash;
         output.save();
     }
 }
