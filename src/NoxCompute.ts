@@ -78,7 +78,7 @@ export function handlePlaintextToEncrypted(event: PlaintextToEncryptedEvent): vo
     );
 }
 
-// ============ Binary Operation Handlers ============
+// ============ Core Primitive Handlers ============
 
 export function handleAdd(event: AddEvent): void {
     createOperation(
@@ -234,7 +234,7 @@ export function handleSelect(event: SelectEvent): void {
     );
 }
 
-// ============ Composite Operation Handlers ============
+// ============ Advanced Function Handlers ============
 
 export function handleTransfer(event: TransferEvent): void {
     createOperation(

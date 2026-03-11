@@ -319,7 +319,7 @@ describe('PlaintextToEncrypted Tests', () => {
     });
 });
 
-// ============ Binary Operation Tests ============
+// ============ Core Primitive Tests ============
 
 describe('Handle Lineage Tests', () => {
     afterAll(() => {
@@ -655,9 +655,9 @@ describe('Select Operation Tests', () => {
     });
 });
 
-// ============ Composite Operation Tests ============
+// ============ Advanced Function Tests ============
 
-describe('Composite Operation Tests', () => {
+describe('Advanced Function Tests', () => {
     afterAll(() => {
         clearStore();
     });

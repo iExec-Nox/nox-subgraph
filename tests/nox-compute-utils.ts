@@ -128,9 +128,9 @@ export function createPlaintextToEncryptedEvent(
     return event;
 }
 
-// ============ Binary Operation Event Factories ============
+// ============ Core Primitive Event Factories ============
 
-function createBinaryOpEvent<T>(
+function createCorePrimitiveEvent<T>(
     caller: Address,
     leftHandOperand: Bytes,
     rightHandOperand: Bytes,
@@ -169,7 +169,13 @@ export function createAddEvent(
     result: Bytes,
     logIndex: i32 = 0,
 ): Add {
-    return createBinaryOpEvent<Add>(caller, leftHandOperand, rightHandOperand, result, logIndex);
+    return createCorePrimitiveEvent<Add>(
+        caller,
+        leftHandOperand,
+        rightHandOperand,
+        result,
+        logIndex,
+    );
 }
 
 export function createSubEvent(
@@ -179,7 +185,13 @@ export function createSubEvent(
     result: Bytes,
     logIndex: i32 = 0,
 ): Sub {
-    return createBinaryOpEvent<Sub>(caller, leftHandOperand, rightHandOperand, result, logIndex);
+    return createCorePrimitiveEvent<Sub>(
+        caller,
+        leftHandOperand,
+        rightHandOperand,
+        result,
+        logIndex,
+    );
 }
 
 export function createMulEvent(
@@ -189,7 +201,13 @@ export function createMulEvent(
     result: Bytes,
     logIndex: i32 = 0,
 ): Mul {
-    return createBinaryOpEvent<Mul>(caller, leftHandOperand, rightHandOperand, result, logIndex);
+    return createCorePrimitiveEvent<Mul>(
+        caller,
+        leftHandOperand,
+        rightHandOperand,
+        result,
+        logIndex,
+    );
 }
 
 export function createDivEvent(
@@ -199,7 +217,13 @@ export function createDivEvent(
     result: Bytes,
     logIndex: i32 = 0,
 ): Div {
-    return createBinaryOpEvent<Div>(caller, leftHandOperand, rightHandOperand, result, logIndex);
+    return createCorePrimitiveEvent<Div>(
+        caller,
+        leftHandOperand,
+        rightHandOperand,
+        result,
+        logIndex,
+    );
 }
 
 export function createEqEvent(
@@ -209,7 +233,13 @@ export function createEqEvent(
     result: Bytes,
     logIndex: i32 = 0,
 ): Eq {
-    return createBinaryOpEvent<Eq>(caller, leftHandOperand, rightHandOperand, result, logIndex);
+    return createCorePrimitiveEvent<Eq>(
+        caller,
+        leftHandOperand,
+        rightHandOperand,
+        result,
+        logIndex,
+    );
 }
 
 export function createNeEvent(
@@ -219,7 +249,13 @@ export function createNeEvent(
     result: Bytes,
     logIndex: i32 = 0,
 ): Ne {
-    return createBinaryOpEvent<Ne>(caller, leftHandOperand, rightHandOperand, result, logIndex);
+    return createCorePrimitiveEvent<Ne>(
+        caller,
+        leftHandOperand,
+        rightHandOperand,
+        result,
+        logIndex,
+    );
 }
 
 export function createLtEvent(
@@ -229,7 +265,13 @@ export function createLtEvent(
     result: Bytes,
     logIndex: i32 = 0,
 ): Lt {
-    return createBinaryOpEvent<Lt>(caller, leftHandOperand, rightHandOperand, result, logIndex);
+    return createCorePrimitiveEvent<Lt>(
+        caller,
+        leftHandOperand,
+        rightHandOperand,
+        result,
+        logIndex,
+    );
 }
 
 export function createLeEvent(
@@ -239,7 +281,13 @@ export function createLeEvent(
     result: Bytes,
     logIndex: i32 = 0,
 ): Le {
-    return createBinaryOpEvent<Le>(caller, leftHandOperand, rightHandOperand, result, logIndex);
+    return createCorePrimitiveEvent<Le>(
+        caller,
+        leftHandOperand,
+        rightHandOperand,
+        result,
+        logIndex,
+    );
 }
 
 export function createGtEvent(
@@ -249,7 +297,13 @@ export function createGtEvent(
     result: Bytes,
     logIndex: i32 = 0,
 ): Gt {
-    return createBinaryOpEvent<Gt>(caller, leftHandOperand, rightHandOperand, result, logIndex);
+    return createCorePrimitiveEvent<Gt>(
+        caller,
+        leftHandOperand,
+        rightHandOperand,
+        result,
+        logIndex,
+    );
 }
 
 export function createGeEvent(
@@ -259,7 +313,13 @@ export function createGeEvent(
     result: Bytes,
     logIndex: i32 = 0,
 ): Ge {
-    return createBinaryOpEvent<Ge>(caller, leftHandOperand, rightHandOperand, result, logIndex);
+    return createCorePrimitiveEvent<Ge>(
+        caller,
+        leftHandOperand,
+        rightHandOperand,
+        result,
+        logIndex,
+    );
 }
 
 // ============ Safe Operation Event Factories ============
@@ -412,9 +472,9 @@ export function createSelectEvent(
     return event;
 }
 
-// ============ Composite Operation Event Factories ============
+// ============ Advanced Function Event Factories ============
 
-function createCompositeOpEvent<T>(
+function createAdvancedFunctionEvent<T>(
     caller: Address,
     param1Name: string,
     param1: Bytes,
@@ -470,7 +530,7 @@ export function createTransferEvent(
     newBalanceTo: Bytes,
     logIndex: i32 = 0,
 ): Transfer {
-    return createCompositeOpEvent<Transfer>(
+    return createAdvancedFunctionEvent<Transfer>(
         caller,
         'balanceFrom',
         balanceFrom,
@@ -498,7 +558,7 @@ export function createMintEvent(
     newTotalSupply: Bytes,
     logIndex: i32 = 0,
 ): Mint {
-    return createCompositeOpEvent<Mint>(
+    return createAdvancedFunctionEvent<Mint>(
         caller,
         'balanceTo',
         balanceTo,
@@ -526,7 +586,7 @@ export function createBurnEvent(
     newTotalSupply: Bytes,
     logIndex: i32 = 0,
 ): Burn {
-    return createCompositeOpEvent<Burn>(
+    return createAdvancedFunctionEvent<Burn>(
         caller,
         'balanceFrom',
         balanceFrom,
