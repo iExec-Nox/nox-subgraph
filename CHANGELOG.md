@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/iExec-Nox/nox-subgraph/compare/v0.2.0...v0.2.1) (2026-03-11)
+
+
+### ✍️ Changed
+
+* start block and rpc ([fca6d15](https://github.com/iExec-Nox/nox-subgraph/commit/fca6d1527b9b4d61a2c596b5c9cad8b6190a1375))
+
 ## [0.2.0](https://github.com/iExec-Nox/nox-subgraph/compare/v0.1.1...v0.2.0) (2026-03-11)
 
 
