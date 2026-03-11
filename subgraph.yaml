@@ -29,4 +29,42 @@ dataSources:
                 handler: handleMarkedAsPubliclyDecryptable
               - event: ViewerAdded(indexed address,indexed address,indexed bytes32)
                 handler: handleViewerAdded
+              - event: PlaintextToEncrypted(indexed address,bytes32,uint8,bytes32)
+                handler: handlePlaintextToEncrypted
+              - event: Add(indexed address,bytes32,bytes32,bytes32)
+                handler: handleAdd
+              - event: Sub(indexed address,bytes32,bytes32,bytes32)
+                handler: handleSub
+              - event: Mul(indexed address,bytes32,bytes32,bytes32)
+                handler: handleMul
+              - event: Div(indexed address,bytes32,bytes32,bytes32)
+                handler: handleDiv
+              - event: Eq(indexed address,bytes32,bytes32,bytes32)
+                handler: handleEq
+              - event: Ne(indexed address,bytes32,bytes32,bytes32)
+                handler: handleNe
+              - event: Lt(indexed address,bytes32,bytes32,bytes32)
+                handler: handleLt
+              - event: Le(indexed address,bytes32,bytes32,bytes32)
+                handler: handleLe
+              - event: Gt(indexed address,bytes32,bytes32,bytes32)
+                handler: handleGt
+              - event: Ge(indexed address,bytes32,bytes32,bytes32)
+                handler: handleGe
+              - event: SafeAdd(indexed address,bytes32,bytes32,bytes32,bytes32)
+                handler: handleSafeAdd
+              - event: SafeSub(indexed address,bytes32,bytes32,bytes32,bytes32)
+                handler: handleSafeSub
+              - event: SafeMul(indexed address,bytes32,bytes32,bytes32,bytes32)
+                handler: handleSafeMul
+              - event: SafeDiv(indexed address,bytes32,bytes32,bytes32,bytes32)
+                handler: handleSafeDiv
+              - event: Select(indexed address,bytes32,bytes32,bytes32,bytes32)
+                handler: handleSelect
+              - event: Transfer(indexed address,bytes32,bytes32,bytes32,bytes32,bytes32,bytes32)
+                handler: handleTransfer
+              - event: Mint(indexed address,bytes32,bytes32,bytes32,bytes32,bytes32,bytes32)
+                handler: handleMint
+              - event: Burn(indexed address,bytes32,bytes32,bytes32,bytes32,bytes32,bytes32)
+                handler: handleBurn
           file: ./src/NoxCompute.ts
