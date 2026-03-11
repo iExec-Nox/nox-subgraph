@@ -10,7 +10,7 @@ dataSources:
       source:
           address: '0x5633472D35E18464CA24Ab974954fB3b1B122eA6'
           abi: NoxCompute
-          startBlock: 234946800
+          startBlock: 245719520
 
       mapping:
           kind: ethereum/events
