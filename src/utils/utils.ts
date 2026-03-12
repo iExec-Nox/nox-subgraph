@@ -1,7 +1,11 @@
 import { BigInt, Bytes } from '@graphprotocol/graph-ts';
 import { Handle, HandleRole } from '../../generated/schema';
 
-export function getOrCreateHandle(handleId: Bytes): Handle {
+export function getOrCreateHandle(
+    handleId: Bytes,
+    blockNumber: BigInt,
+    blockTimestamp: BigInt,
+): Handle {
     let handle = Handle.load(handleId);
     if (handle == null) {
         handle = new Handle(handleId);
@@ -9,6 +13,8 @@ export function getOrCreateHandle(handleId: Bytes): Handle {
         handle.operator = '';
         handle.parentHandles = new Array<Bytes>(0);
         handle.childHandles = new Array<Bytes>(0);
+        handle.blockNumber = blockNumber;
+        handle.blockTimestamp = blockTimestamp;
         handle.save();
     }
     return handle;
@@ -19,10 +25,11 @@ export function createOperation(
     operandIds: Bytes[],
     outputIds: Bytes[],
     txHash: Bytes,
-    logIndex: i32,
+    blockNumber: BigInt,
+    blockTimestamp: BigInt,
 ): void {
     for (let i = 0; i < operandIds.length; i++) {
-        getOrCreateHandle(operandIds[i]);
+        getOrCreateHandle(operandIds[i], blockNumber, blockTimestamp);
     }
 
     for (let i = 0; i < outputIds.length; i++) {
@@ -35,6 +42,8 @@ export function createOperation(
         output.operator = operator;
         output.parentHandles = operandIds;
         output.transactionHash = txHash;
+        output.blockNumber = blockNumber;
+        output.blockTimestamp = blockTimestamp;
         output.save();
     }
 
@@ -55,7 +64,8 @@ export function createPlaintextOperation(
     plaintext: Bytes,
     outputIds: Bytes[],
     txHash: Bytes,
-    logIndex: i32,
+    blockNumber: BigInt,
+    blockTimestamp: BigInt,
 ): void {
     for (let i = 0; i < outputIds.length; i++) {
         let output = Handle.load(outputIds[i]);
@@ -68,6 +78,8 @@ export function createPlaintextOperation(
         output.parentHandles = new Array<Bytes>(0);
         output.plaintext = plaintext;
         output.transactionHash = txHash;
+        output.blockNumber = blockNumber;
+        output.blockTimestamp = blockTimestamp;
         output.save();
     }
 }

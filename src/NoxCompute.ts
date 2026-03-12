@@ -32,7 +32,11 @@ import {
 // ============ ACL Handlers ============
 
 export function handleAllowed(event: AllowedEvent): void {
-    const handle = getOrCreateHandle(event.params.handle);
+    const handle = getOrCreateHandle(
+        event.params.handle,
+        event.block.number,
+        event.block.timestamp,
+    );
     createRole(
         handle,
         event.params.account,
@@ -47,13 +51,21 @@ export function handleAllowed(event: AllowedEvent): void {
 }
 
 export function handleMarkedAsPubliclyDecryptable(event: MarkedAsPubliclyDecryptableEvent): void {
-    const handle = getOrCreateHandle(event.params.handle);
+    const handle = getOrCreateHandle(
+        event.params.handle,
+        event.block.number,
+        event.block.timestamp,
+    );
     handle.isPubliclyDecryptable = true;
     handle.save();
 }
 
 export function handleViewerAdded(event: ViewerAddedEvent): void {
-    const handle = getOrCreateHandle(event.params.handle);
+    const handle = getOrCreateHandle(
+        event.params.handle,
+        event.block.number,
+        event.block.timestamp,
+    );
     createRole(
         handle,
         event.params.viewer,
@@ -74,7 +86,8 @@ export function handlePlaintextToEncrypted(event: PlaintextToEncryptedEvent): vo
         event.params.plaintext,
         [event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -86,7 +99,8 @@ export function handleAdd(event: AddEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -96,7 +110,8 @@ export function handleSub(event: SubEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -106,7 +121,8 @@ export function handleMul(event: MulEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -116,7 +132,8 @@ export function handleDiv(event: DivEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -126,7 +143,8 @@ export function handleEq(event: EqEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -136,7 +154,8 @@ export function handleNe(event: NeEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -146,7 +165,8 @@ export function handleLt(event: LtEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -156,7 +176,8 @@ export function handleLe(event: LeEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -166,7 +187,8 @@ export function handleGt(event: GtEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -176,7 +198,8 @@ export function handleGe(event: GeEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -188,7 +211,8 @@ export function handleSafeAdd(event: SafeAddEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.success, event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -198,7 +222,8 @@ export function handleSafeSub(event: SafeSubEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.success, event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -208,7 +233,8 @@ export function handleSafeMul(event: SafeMulEvent): void {
         [event.params.leftHandOperand, event.params.rightHandOperand],
         [event.params.success, event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -218,7 +244,8 @@ export function handleSafeDiv(event: SafeDivEvent): void {
         [event.params.numerator, event.params.denominator],
         [event.params.success, event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -230,7 +257,8 @@ export function handleSelect(event: SelectEvent): void {
         [event.params.condition, event.params.ifTrue, event.params.ifFalse],
         [event.params.result],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -242,7 +270,8 @@ export function handleTransfer(event: TransferEvent): void {
         [event.params.balanceFrom, event.params.balanceTo, event.params.amount],
         [event.params.success, event.params.newBalanceFrom, event.params.newBalanceTo],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -252,7 +281,8 @@ export function handleMint(event: MintEvent): void {
         [event.params.balanceTo, event.params.amount, event.params.totalSupply],
         [event.params.success, event.params.newBalanceTo, event.params.newTotalSupply],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
 
@@ -262,6 +292,7 @@ export function handleBurn(event: BurnEvent): void {
         [event.params.balanceFrom, event.params.amount, event.params.totalSupply],
         [event.params.success, event.params.newBalanceFrom, event.params.newTotalSupply],
         event.transaction.hash,
-        event.logIndex.toI32(),
+        event.block.number,
+        event.block.timestamp,
     );
 }
