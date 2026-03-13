@@ -11,6 +11,8 @@ type Handle @entity(immutable: false) {
   parentHandles: [Handle!]!
   childHandles: [Handle!]!
   roles: [HandleRole!]! @derivedFrom(field: "handle")
+  blockNumber: BigInt
+  blockTimestamp: BigInt
   transactionHash: Bytes
 }
 
