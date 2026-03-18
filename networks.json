@@ -1,8 +1,8 @@
 {
     "arbitrum-sepolia": {
         "NoxCompute": {
-            "address": "0x5633472D35E18464CA24Ab974954fB3b1B122eA6",
-            "startBlock": 245719520
+            "address": "0xd464B198f06756a1d00be223634b85E0a731c229",
+            "startBlock": 250991603
         }
     }
 }
