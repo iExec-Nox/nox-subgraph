@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/iExec-Nox/nox-subgraph/compare/v0.2.1...v0.3.0) (2026-03-18)
+
+
+### 🚀 Added
+
+* add handle block timestamp ([#12](https://github.com/iExec-Nox/nox-subgraph/issues/12)) ([6f9e740](https://github.com/iExec-Nox/nox-subgraph/commit/6f9e740d433ea71abdf87980c9316fa975d269b1))
+* update NoxCompute Address ([#15](https://github.com/iExec-Nox/nox-subgraph/issues/15)) ([7e18ac1](https://github.com/iExec-Nox/nox-subgraph/commit/7e18ac1bf5931955855680242c9255cdc868f9e2))
+
 ## [0.2.1](https://github.com/iExec-Nox/nox-subgraph/compare/v0.2.0...v0.2.1) (2026-03-11)
 
 
