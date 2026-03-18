@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/iExec-Nox/nox-subgraph/compare/v0.3.0...v0.4.0) (2026-03-18)
+
+
+### 🚀 Added
+
+* release 0.4.0 ([09b0163](https://github.com/iExec-Nox/nox-subgraph/commit/09b0163caa106d679d1b2f045c0c3acc3df89308))
+
 ## [0.3.0](https://github.com/iExec-Nox/nox-subgraph/compare/v0.2.1...v0.3.0) (2026-03-18)
 
 
