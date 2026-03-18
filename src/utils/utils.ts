@@ -1,5 +1,7 @@
-import { BigInt, Bytes } from '@graphprotocol/graph-ts';
-import { Handle, HandleRole } from '../../generated/schema';
+import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts';
+import { ConfidentialToken as ConfidentialTokenContract } from '../../generated/NoxCompute/ConfidentialToken';
+import { Account, ConfidentialToken, Handle, HandleRole } from '../../generated/schema';
+import { ConfidentialToken as ConfidentialTokenTemplate } from '../../generated/templates';
 
 export function getOrCreateHandle(
     handleId: Bytes,
@@ -84,6 +86,15 @@ export function createPlaintextOperation(
     }
 }
 
+export function getOrCreateAccount(address: Bytes): Account {
+    let account = Account.load(address);
+    if (account == null) {
+        account = new Account(address);
+        account.save();
+    }
+    return account;
+}
+
 export function createRole(
     handle: Handle,
     account: Bytes,
@@ -94,14 +105,52 @@ export function createRole(
     blockNumber: BigInt,
     blockTimestamp: BigInt,
 ): void {
+    let acc = getOrCreateAccount(account);
     const roleId = txHash.concatI32(logIndex);
     const handleRole = new HandleRole(roleId);
     handleRole.handle = handle.id;
-    handleRole.account = account;
+    handleRole.account = acc.id;
     handleRole.role = role;
     handleRole.grantedBy = grantedBy;
     handleRole.blockNumber = blockNumber;
     handleRole.blockTimestamp = blockTimestamp;
     handleRole.transactionHash = txHash;
     handleRole.save();
+}
+
+// ============ Confidential Token Helpers ============
+
+export function getOrCreateConfidentialToken(tokenAddress: Address): ConfidentialToken | null {
+    let token = ConfidentialToken.load(tokenAddress);
+    if (token != null) {
+        return token;
+    }
+
+    let contract = ConfidentialTokenContract.bind(tokenAddress);
+    let nameCall = contract.try_name();
+    if (nameCall.reverted) {
+        return null;
+    }
+    let symbolCall = contract.try_symbol();
+    if (symbolCall.reverted) {
+        return null;
+    }
+    let decimalsCall = contract.try_decimals();
+    if (decimalsCall.reverted) {
+        return null;
+    }
+
+    token = new ConfidentialToken(tokenAddress);
+    token.name = nameCall.value;
+    token.symbol = symbolCall.value;
+    token.decimals = decimalsCall.value;
+
+    let underlyingCall = contract.try_underlying();
+    token.isWrapped = !underlyingCall.reverted;
+
+    token.save();
+
+    ConfidentialTokenTemplate.create(tokenAddress);
+
+    return token;
 }

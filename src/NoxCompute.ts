@@ -26,6 +26,7 @@ import {
     createOperation,
     createPlaintextOperation,
     createRole,
+    getOrCreateConfidentialToken,
     getOrCreateHandle,
 } from './utils/utils';
 
@@ -265,6 +266,7 @@ export function handleSelect(event: SelectEvent): void {
 // ============ Advanced Function Handlers ============
 
 export function handleTransfer(event: TransferEvent): void {
+    getOrCreateConfidentialToken(event.params.caller);
     createOperation(
         'Transfer',
         [event.params.balanceFrom, event.params.balanceTo, event.params.amount],
@@ -276,6 +278,7 @@ export function handleTransfer(event: TransferEvent): void {
 }
 
 export function handleMint(event: MintEvent): void {
+    getOrCreateConfidentialToken(event.params.caller);
     createOperation(
         'Mint',
         [event.params.balanceTo, event.params.amount, event.params.totalSupply],
@@ -287,6 +290,7 @@ export function handleMint(event: MintEvent): void {
 }
 
 export function handleBurn(event: BurnEvent): void {
+    getOrCreateConfidentialToken(event.params.caller);
     createOperation(
         'Burn',
         [event.params.balanceFrom, event.params.amount, event.params.totalSupply],

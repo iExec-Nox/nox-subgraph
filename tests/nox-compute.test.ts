@@ -1,5 +1,12 @@
 import { Address, Bytes } from '@graphprotocol/graph-ts';
-import { afterAll, assert, clearStore, describe, test } from 'matchstick-as/assembly/index';
+import {
+    afterAll,
+    assert,
+    clearStore,
+    createMockedFunction,
+    describe,
+    test,
+} from 'matchstick-as/assembly/index';
 import {
     handleAdd,
     handleAllowed,
@@ -665,6 +672,7 @@ describe('Advanced Function Tests', () => {
     describe('Transfer', () => {
         test('Transfer creates 3 output handles with 3 parents', () => {
             clearStore();
+            createMockedFunction(caller1, 'name', 'name():(string)').reverts();
             const event = createTransferEvent(
                 caller1,
                 leftOperand,
@@ -691,6 +699,7 @@ describe('Advanced Function Tests', () => {
     describe('Mint', () => {
         test('Mint creates 3 output handles with 3 parents', () => {
             clearStore();
+            createMockedFunction(caller1, 'name', 'name():(string)').reverts();
             const event = createMintEvent(
                 caller1,
                 leftOperand,
@@ -717,6 +726,7 @@ describe('Advanced Function Tests', () => {
     describe('Burn', () => {
         test('Burn creates 3 output handles with 3 parents', () => {
             clearStore();
+            createMockedFunction(caller1, 'name', 'name():(string)').reverts();
             const event = createBurnEvent(
                 caller1,
                 leftOperand,

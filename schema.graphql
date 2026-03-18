@@ -1,28 +1,76 @@
 enum Role {
-  ADMIN
-  VIEWER
+    ADMIN
+    VIEWER
 }
 
 type Handle @entity(immutable: false) {
-  id: Bytes!
-  isPubliclyDecryptable: Boolean!
-  plaintext: Bytes
-  operator: String!
-  parentHandles: [Handle!]!
-  childHandles: [Handle!]!
-  roles: [HandleRole!]! @derivedFrom(field: "handle")
-  blockNumber: BigInt
-  blockTimestamp: BigInt
-  transactionHash: Bytes
+    id: Bytes!
+    isPubliclyDecryptable: Boolean!
+    plaintext: Bytes
+    operator: String!
+    parentHandles: [Handle!]!
+    childHandles: [Handle!]!
+    roles: [HandleRole!]! @derivedFrom(field: "handle")
+    blockNumber: BigInt
+    blockTimestamp: BigInt
+    transactionHash: Bytes
 }
 
 type HandleRole @entity(immutable: true) {
-  id: Bytes!
-  handle: Handle!
-  account: Bytes!
-  role: Role!
-  grantedBy: Bytes!
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+    id: Bytes!
+    handle: Handle!
+    account: Account!
+    role: Role!
+    grantedBy: Bytes!
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+}
+
+type Account @entity(immutable: false) {
+    id: Bytes! # address
+    roles: [HandleRole!]! @derivedFrom(field: "account")
+    confidentialBalances: [ConfidentialBalance!]! @derivedFrom(field: "account")
+}
+
+type ConfidentialToken @entity(immutable: false) {
+    id: Bytes! # token contract address
+    name: String!
+    symbol: String!
+    decimals: Int!
+    isWrapped: Boolean!
+    balances: [ConfidentialBalance!]! @derivedFrom(field: "token")
+    transfers: [ConfidentialTransfer!]! @derivedFrom(field: "token")
+    operators: [TokenOperator!]! @derivedFrom(field: "token")
+}
+
+type ConfidentialTransfer @entity(immutable: true) {
+    id: Bytes! # txHash.concatI32(logIndex)
+    token: ConfidentialToken!
+    from: Account # null for wrap (mint from zero address)
+    to: Account # null for unwrap (burn to zero address)
+    amountHandle: Handle # handle of the transferred amount
+    fromBalanceHandle: Handle # snapshot of sender balance handle after transfer
+    toBalanceHandle: Handle # snapshot of receiver balance handle after transfer
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+}
+
+type TokenOperator @entity(immutable: false) {
+    id: Bytes! # token.concat(holder).concat(operator)
+    token: ConfidentialToken!
+    holder: Account!
+    operator: Account!
+    until: BigInt! # expiration timestamp
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+}
+
+type ConfidentialBalance @entity(immutable: false) {
+    id: Bytes! # token.concat(account)
+    token: ConfidentialToken!
+    account: Account!
+    balanceHandle: Handle! # handle of the current encrypted balance
 }

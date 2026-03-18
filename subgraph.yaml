@@ -19,9 +19,13 @@ dataSources:
           entities:
               - Handle
               - HandleRole
+              - Account
+              - ConfidentialToken
           abis:
               - name: NoxCompute
                 file: ./abis/NoxCompute.json
+              - name: ConfidentialToken
+                file: ./abis/ConfidentialToken.json
           eventHandlers:
               - event: Allowed(indexed address,indexed address,indexed bytes32)
                 handler: handleAllowed
@@ -68,3 +72,30 @@ dataSources:
               - event: Burn(indexed address,bytes32,bytes32,bytes32,bytes32,bytes32,bytes32)
                 handler: handleBurn
           file: ./src/NoxCompute.ts
+templates:
+    - kind: ethereum
+      name: ConfidentialToken
+      network: arbitrum-sepolia
+      source:
+          abi: ConfidentialToken
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.9
+          language: wasm/assemblyscript
+          entities:
+              - Account
+              - ConfidentialToken
+              - ConfidentialTransfer
+              - ConfidentialBalance
+              - TokenOperator
+          abis:
+              - name: ConfidentialToken
+                file: ./abis/ConfidentialToken.json
+          eventHandlers:
+              - event: ConfidentialTransfer(indexed address,indexed address,indexed uint256)
+                handler: handleConfidentialTransfer
+              - event: OperatorSet(indexed address,indexed address,indexed uint64)
+                handler: handleOperatorSet
+              - event: AmountDisclosed(indexed uint256,uint64)
+                handler: handleAmountDisclosed
+          file: ./src/ConfidentialToken.ts
