@@ -12,7 +12,6 @@ import {
     Mint as MintEvent,
     Mul as MulEvent,
     Ne as NeEvent,
-    PlaintextToEncrypted as PlaintextToEncryptedEvent,
     SafeAdd as SafeAddEvent,
     SafeDiv as SafeDivEvent,
     SafeMul as SafeMulEvent,
@@ -21,11 +20,12 @@ import {
     Sub as SubEvent,
     Transfer as TransferEvent,
     ViewerAdded as ViewerAddedEvent,
+    WrapAsPublicHandle as WrapAsPublicHandleEvent,
 } from '../generated/NoxCompute/NoxCompute';
 import {
     createOperation,
-    createPlaintextOperation,
     createRole,
+    createWrapAsPublicHandleOperation,
     getOrCreateHandle,
 } from './utils/utils';
 
@@ -79,10 +79,10 @@ export function handleViewerAdded(event: ViewerAddedEvent): void {
     handle.save();
 }
 
-// ============ PlaintextToEncrypted Handler ============
+// ============ WrapAsPublicHandle Handler ============
 
-export function handlePlaintextToEncrypted(event: PlaintextToEncryptedEvent): void {
-    createPlaintextOperation(
+export function handleWrapAsPublicHandle(event: WrapAsPublicHandleEvent): void {
+    createWrapAsPublicHandleOperation(
         event.params.plaintext,
         [event.params.result],
         event.transaction.hash,

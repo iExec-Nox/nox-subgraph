@@ -60,7 +60,7 @@ export function createOperation(
     }
 }
 
-export function createPlaintextOperation(
+export function createWrapAsPublicHandleOperation(
     plaintext: Bytes,
     outputIds: Bytes[],
     txHash: Bytes,
@@ -74,7 +74,7 @@ export function createPlaintextOperation(
             output.isPubliclyDecryptable = false;
             output.childHandles = new Array<Bytes>(0);
         }
-        output.operator = 'PlaintextToEncrypted';
+        output.operator = 'WrapAsPublicHandle';
         output.parentHandles = new Array<Bytes>(0);
         output.plaintext = plaintext;
         output.transactionHash = txHash;

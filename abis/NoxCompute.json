@@ -100,7 +100,7 @@
                     "type": "bytes32"
                 }
             ],
-            "name": "PlaintextToEncrypted",
+            "name": "WrapAsPublicHandle",
             "type": "event"
         },
         {
