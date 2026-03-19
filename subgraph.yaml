@@ -27,8 +27,8 @@ dataSources:
                 handler: handleMarkedAsPubliclyDecryptable
               - event: ViewerAdded(indexed address,indexed address,indexed bytes32)
                 handler: handleViewerAdded
-              - event: PlaintextToEncrypted(indexed address,bytes32,uint8,bytes32)
-                handler: handlePlaintextToEncrypted
+              - event: WrapAsPublicHandle(indexed address,bytes32,uint8,bytes32)
+                handler: handleWrapAsPublicHandle
               - event: Add(indexed address,bytes32,bytes32,bytes32)
                 handler: handleAdd
               - event: Sub(indexed address,bytes32,bytes32,bytes32)

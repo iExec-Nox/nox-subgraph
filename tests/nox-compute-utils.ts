@@ -14,7 +14,6 @@ import {
     Mint,
     Mul,
     Ne,
-    PlaintextToEncrypted,
     SafeAdd,
     SafeDiv,
     SafeMul,
@@ -23,6 +22,7 @@ import {
     Sub,
     Transfer,
     ViewerAdded,
+    WrapAsPublicHandle,
 } from '../generated/NoxCompute/NoxCompute';
 
 export function createAllowedEvent(
@@ -103,16 +103,16 @@ export function createViewerAddedEvent(
     return viewerAddedEvent;
 }
 
-// ============ PlaintextToEncrypted Event Factory ============
+// ============ WrapAsPublicHandle Event Factory ============
 
-export function createPlaintextToEncryptedEvent(
+export function createWrapAsPublicHandleEvent(
     caller: Address,
     plaintext: Bytes,
     toType: i32,
     result: Bytes,
     logIndex: i32 = 0,
-): PlaintextToEncrypted {
-    const event = changetype<PlaintextToEncrypted>(newMockEvent());
+): WrapAsPublicHandle {
+    const event = changetype<WrapAsPublicHandle>(newMockEvent());
 
     event.transaction.hash = Bytes.fromI32(logIndex);
     event.logIndex = BigInt.fromI32(logIndex);
