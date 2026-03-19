@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.1](https://github.com/iExec-Nox/nox-subgraph/compare/v0.4.0...v0.4.1) (2026-03-19)
+
+
+### ✍️ Changed
+
+* update ABI ([#18](https://github.com/iExec-Nox/nox-subgraph/issues/18)) ([a3313f1](https://github.com/iExec-Nox/nox-subgraph/commit/a3313f15d45e082098b357135c32a43be78df666))
+
+
+### 📋 Misc
+
+* remove hardcoded data source ([#17](https://github.com/iExec-Nox/nox-subgraph/issues/17)) ([f05a874](https://github.com/iExec-Nox/nox-subgraph/commit/f05a87460a5411eff909c71624869016634a1a4a))
+
 ## [0.4.0](https://github.com/iExec-Nox/nox-subgraph/compare/v0.3.0...v0.4.0) (2026-03-18)
 
 
