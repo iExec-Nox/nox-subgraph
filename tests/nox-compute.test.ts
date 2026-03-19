@@ -14,7 +14,6 @@ import {
     handleMint,
     handleMul,
     handleNe,
-    handlePlaintextToEncrypted,
     handleSafeAdd,
     handleSafeDiv,
     handleSafeMul,
@@ -23,6 +22,7 @@ import {
     handleSub,
     handleTransfer,
     handleViewerAdded,
+    handleWrapAsPublicHandle,
 } from '../src/NoxCompute';
 import {
     createAddEvent,
@@ -38,7 +38,6 @@ import {
     createMintEvent,
     createMulEvent,
     createNeEvent,
-    createPlaintextToEncryptedEvent,
     createSafeAddEvent,
     createSafeDivEvent,
     createSafeMulEvent,
@@ -47,6 +46,7 @@ import {
     createSubEvent,
     createTransferEvent,
     createViewerAddedEvent,
+    createWrapAsPublicHandleEvent,
 } from './nox-compute-utils';
 
 const handleId = Bytes.fromI32(1_234_567_890);
@@ -256,59 +256,48 @@ describe('Handle Entity Tests', () => {
     });
 });
 
-// ============ PlaintextToEncrypted Tests ============
+// ============ WrapAsPublicHandle Tests ============
 
-describe('PlaintextToEncrypted Tests', () => {
+describe('WrapAsPublicHandle Tests', () => {
     afterAll(() => {
         clearStore();
     });
 
-    test('PlaintextToEncrypted creates Handle with plaintext and operator', () => {
+    test('WrapAsPublicHandle creates Handle with plaintext and operator', () => {
         clearStore();
-        const event = createPlaintextToEncryptedEvent(caller1, plaintextValue, 4, resultHandle);
-        handlePlaintextToEncrypted(event);
+        const event = createWrapAsPublicHandleEvent(caller1, plaintextValue, 4, resultHandle);
+        handleWrapAsPublicHandle(event);
 
         assert.entityCount('Handle', 1);
 
         const resultHex = resultHandle.toHexString();
-        assert.fieldEquals('Handle', resultHex, 'operator', 'PlaintextToEncrypted');
+        assert.fieldEquals('Handle', resultHex, 'operator', 'WrapAsPublicHandle');
         assert.fieldEquals('Handle', resultHex, 'plaintext', plaintextValue.toHexString());
         assert.fieldEquals('Handle', resultHex, 'parentHandles', '[]');
         assert.fieldEquals('Handle', resultHex, 'isPubliclyDecryptable', 'false');
     });
 
-    test('PlaintextToEncrypted handle can also have roles', () => {
+    test('WrapAsPublicHandle handle can also have roles', () => {
         clearStore();
-        const ptEvent = createPlaintextToEncryptedEvent(
-            caller1,
-            plaintextValue,
-            4,
-            resultHandle,
-            1,
-        );
-        handlePlaintextToEncrypted(ptEvent);
+        const ptEvent = createWrapAsPublicHandleEvent(caller1, plaintextValue, 4, resultHandle, 1);
+        handleWrapAsPublicHandle(ptEvent);
 
         const allowedEvent = createAllowedEvent(sender1, account1, resultHandle, 2);
         handleAllowed(allowedEvent);
 
-        assert.fieldEquals(
-            'Handle',
-            resultHandle.toHexString(),
-            'operator',
-            'PlaintextToEncrypted',
-        );
+        assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'WrapAsPublicHandle');
         assert.entityCount('HandleRole', 1);
     });
 
-    test('PlaintextToEncrypted handle used as operand in binary op', () => {
+    test('WrapAsPublicHandle handle used as operand in binary op', () => {
         clearStore();
-        const ptEvent = createPlaintextToEncryptedEvent(caller1, plaintextValue, 4, leftOperand, 1);
-        handlePlaintextToEncrypted(ptEvent);
+        const ptEvent = createWrapAsPublicHandleEvent(caller1, plaintextValue, 4, leftOperand, 1);
+        handleWrapAsPublicHandle(ptEvent);
 
         const addEvent = createAddEvent(caller1, leftOperand, rightOperand, resultHandle, 2);
         handleAdd(addEvent);
 
-        assert.fieldEquals('Handle', leftOperand.toHexString(), 'operator', 'PlaintextToEncrypted');
+        assert.fieldEquals('Handle', leftOperand.toHexString(), 'operator', 'WrapAsPublicHandle');
         assert.fieldEquals('Handle', resultHandle.toHexString(), 'operator', 'Add');
         assert.fieldEquals(
             'Handle',
