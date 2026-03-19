@@ -73,7 +73,14 @@ npm run deploy-studio
 
 ### Local development
 
+env:
+
+- `SUBGRAPH_NETWORK_NAME`: target network name
+- `VERSION_LABEL`: deployment version label (default `dev`)
+
 ```sh
+export SUBGRAPH_NETWORK_NAME="arbitrum-sepolia"
+
 # create a local subgraph
 npm run create-local
 

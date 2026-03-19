@@ -17,7 +17,7 @@
         "deploy-studio": "graph deploy ${SUBGRAPH_SLUG} --deploy-key ${SUBGRAPH_DEPLOY_KEY} --network ${SUBGRAPH_NETWORK_NAME} --version-label ${VERSION_LABEL}",
         "create-local": "graph create --node http://localhost:8020/ nox-protocol",
         "remove-local": "graph remove --node http://localhost:8020/ nox-protocol",
-        "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 nox-protocol",
+        "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 nox-protocol --network ${SUBGRAPH_NETWORK_NAME} --version-label ${VERSION_LABEL:-dev}",
         "all": "npm run codegen && npm run build && npm run test",
         "format": "prettier --write \"(src|tests)/**/*.{js,ts}\"",
         "check-format": "prettier --check \"(src|tests)/**/*.{js,ts}\"",
