@@ -8,7 +8,7 @@
     },
     "homepage": "https://github.com/iExec-Nox/nox-subgraph#readme",
     "bugs": "https://github.com/iExec-Nox/nox-subgraph/issues",
-    "license": "Apache-2.0",
+    "license": "MIT",
     "scripts": {
         "prepare": "husky",
         "codegen": "graph codegen",
