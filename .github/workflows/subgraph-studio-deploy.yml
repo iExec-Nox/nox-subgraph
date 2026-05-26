@@ -9,7 +9,7 @@ on:
         type: choice
         options:
           - arbitrum-sepolia
-          - arbitrum
+          - sepolia
       version_label:
         description: 'Version label for the subgraph deployment'
         required: true
