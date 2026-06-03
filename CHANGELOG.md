@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/iExec-Nox/nox-subgraph/compare/v0.4.1...v0.5.0) (2026-06-03)
+
+
+### 🚀 Added
+
+* add support for Sepolia network ([#22](https://github.com/iExec-Nox/nox-subgraph/issues/22)) ([6a518ab](https://github.com/iExec-Nox/nox-subgraph/commit/6a518ab9526f700bd7c207b922a4438fbba1c383))
+
+
+### ✍️ Changed
+
+* Align with MIT license for Nox repositories ([#20](https://github.com/iExec-Nox/nox-subgraph/issues/20)) ([bed70d2](https://github.com/iExec-Nox/nox-subgraph/commit/bed70d290316a060822a3830fab82206b1e572b7))
+
 ## [0.4.1](https://github.com/iExec-Nox/nox-subgraph/compare/v0.4.0...v0.4.1) (2026-03-19)
 
 
