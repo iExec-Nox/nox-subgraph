@@ -4,5 +4,11 @@
             "address": "0xd464B198f06756a1d00be223634b85E0a731c229",
             "startBlock": 250991603
         }
+    },
+    "sepolia": {
+        "NoxCompute": {
+            "address": "0x24Ef36Ec5b626D7DCd09a98F3083C2758F0F77bF",
+            "startBlock": 10974984
+        }
     }
 }
