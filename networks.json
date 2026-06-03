@@ -7,8 +7,8 @@
     },
     "sepolia": {
         "NoxCompute": {
-            "address": "0x0000000000000000000000000000000000000000",
-            "startBlock": 0
+            "address": "0x24Ef36Ec5b626D7DCd09a98F3083C2758F0F77bF",
+            "startBlock": 10974984
         }
     }
 }
