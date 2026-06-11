@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/iExec-Nox/nox-subgraph/compare/v0.5.0...v0.5.1) (2026-06-11)
+
+
+### ✍️ Changed
+
+* include transaction hash in handle creation and related functions ([#23](https://github.com/iExec-Nox/nox-subgraph/issues/23)) ([92c4e17](https://github.com/iExec-Nox/nox-subgraph/commit/92c4e174b3f4703d70bb5cc293bd74a407abd733))
+
 ## [0.5.0](https://github.com/iExec-Nox/nox-subgraph/compare/v0.4.1...v0.5.0) (2026-06-03)
 
 
