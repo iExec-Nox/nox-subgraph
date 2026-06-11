@@ -36,6 +36,7 @@ export function handleAllowed(event: AllowedEvent): void {
         event.params.handle,
         event.block.number,
         event.block.timestamp,
+        event.transaction.hash,
     );
     createRole(
         handle,
@@ -55,6 +56,7 @@ export function handleMarkedAsPubliclyDecryptable(event: MarkedAsPubliclyDecrypt
         event.params.handle,
         event.block.number,
         event.block.timestamp,
+        event.transaction.hash,
     );
     handle.isPubliclyDecryptable = true;
     handle.save();
@@ -65,6 +67,7 @@ export function handleViewerAdded(event: ViewerAddedEvent): void {
         event.params.handle,
         event.block.number,
         event.block.timestamp,
+        event.transaction.hash,
     );
     createRole(
         handle,

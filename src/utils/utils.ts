@@ -5,16 +5,22 @@ export function getOrCreateHandle(
     handleId: Bytes,
     blockNumber: BigInt,
     blockTimestamp: BigInt,
+    txHash: Bytes,
 ): Handle {
     let handle = Handle.load(handleId);
     if (handle == null) {
         handle = new Handle(handleId);
         handle.isPubliclyDecryptable = false;
+        // Handle is being created as a side-effect (ACL event, or operand
+        // discovered by a child operation). There is no "creation tx" for
+        // handles created through the gateway, so we record the discovering
+        // tx to ensure downstream consumers get a non-null transactionHash.
         handle.operator = '';
         handle.parentHandles = new Array<Bytes>(0);
         handle.childHandles = new Array<Bytes>(0);
         handle.blockNumber = blockNumber;
         handle.blockTimestamp = blockTimestamp;
+        handle.transactionHash = txHash;
         handle.save();
     }
     return handle;
@@ -29,7 +35,7 @@ export function createOperation(
     blockTimestamp: BigInt,
 ): void {
     for (let i = 0; i < operandIds.length; i++) {
-        getOrCreateHandle(operandIds[i], blockNumber, blockTimestamp);
+        getOrCreateHandle(operandIds[i], blockNumber, blockTimestamp, txHash);
     }
 
     for (let i = 0; i < outputIds.length; i++) {
