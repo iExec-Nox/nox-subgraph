@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/iExec-Nox/nox-subgraph/compare/v0.5.1...v0.5.2) (2026-06-18)
+
+
+### ✍️ Changed
+
+* preserve handle creation metadata (blockNumber, blockTimestamp, …) ([#25](https://github.com/iExec-Nox/nox-subgraph/issues/25)) ([f13e1de](https://github.com/iExec-Nox/nox-subgraph/commit/f13e1de09c754be002336e599ae05209fd243d2e))
+
 ## [0.5.1](https://github.com/iExec-Nox/nox-subgraph/compare/v0.5.0...v0.5.1) (2026-06-11)
 
 
