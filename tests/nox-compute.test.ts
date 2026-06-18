@@ -1,4 +1,4 @@
-import { Address, Bytes } from '@graphprotocol/graph-ts';
+import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts';
 import { afterAll, assert, clearStore, describe, test } from 'matchstick-as/assembly/index';
 import {
     handleAdd,
@@ -569,6 +569,52 @@ describe('Handle Lineage Tests', () => {
             assert.fieldEquals('Handle', handleId.toHexString(), 'isPubliclyDecryptable', 'false');
             assert.fieldEquals('Handle', handleId.toHexString(), 'operator', '');
             assert.entityCount('Handle', 1);
+        });
+
+        test('Discovery metadata (blockNumber, blockTimestamp, transactionHash) is preserved when handle reappears as operation output', () => {
+            clearStore();
+
+            const firstBlockNumber = BigInt.fromI32(100);
+            const firstBlockTimestamp = BigInt.fromI32(1000);
+            const firstTxHash = Bytes.fromHexString(
+                '0x1111111111111111111111111111111111111111111111111111111111111111',
+            );
+            const allowedEvent = createAllowedEvent(sender1, account1, resultHandle, 1);
+            allowedEvent.block.number = firstBlockNumber;
+            allowedEvent.block.timestamp = firstBlockTimestamp;
+            allowedEvent.transaction.hash = firstTxHash;
+            handleAllowed(allowedEvent);
+
+            const resultHex = resultHandle.toHexString();
+            assert.fieldEquals('Handle', resultHex, 'blockNumber', firstBlockNumber.toString());
+            assert.fieldEquals(
+                'Handle',
+                resultHex,
+                'blockTimestamp',
+                firstBlockTimestamp.toString(),
+            );
+            assert.fieldEquals('Handle', resultHex, 'transactionHash', firstTxHash.toHexString());
+
+            const secondBlockNumber = BigInt.fromI32(200);
+            const secondBlockTimestamp = BigInt.fromI32(2000);
+            const secondTxHash = Bytes.fromHexString(
+                '0x2222222222222222222222222222222222222222222222222222222222222222',
+            );
+            const addEvent = createAddEvent(caller1, leftOperand, rightOperand, resultHandle, 2);
+            addEvent.block.number = secondBlockNumber;
+            addEvent.block.timestamp = secondBlockTimestamp;
+            addEvent.transaction.hash = secondTxHash;
+            handleAdd(addEvent);
+
+            assert.fieldEquals('Handle', resultHex, 'operator', 'Add');
+            assert.fieldEquals('Handle', resultHex, 'blockNumber', firstBlockNumber.toString());
+            assert.fieldEquals(
+                'Handle',
+                resultHex,
+                'blockTimestamp',
+                firstBlockTimestamp.toString(),
+            );
+            assert.fieldEquals('Handle', resultHex, 'transactionHash', firstTxHash.toHexString());
         });
 
         test('Chained operations: result of Add used as operand of Mul', () => {

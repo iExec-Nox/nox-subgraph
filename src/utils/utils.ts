@@ -44,12 +44,12 @@ export function createOperation(
             output = new Handle(outputIds[i]);
             output.isPubliclyDecryptable = false;
             output.childHandles = new Array<Bytes>(0);
+            output.blockNumber = blockNumber;
+            output.blockTimestamp = blockTimestamp;
+            output.transactionHash = txHash;
         }
         output.operator = operator;
         output.parentHandles = operandIds;
-        output.transactionHash = txHash;
-        output.blockNumber = blockNumber;
-        output.blockTimestamp = blockTimestamp;
         output.save();
     }
 
@@ -79,13 +79,13 @@ export function createWrapAsPublicHandleOperation(
             output = new Handle(outputIds[i]);
             output.isPubliclyDecryptable = false;
             output.childHandles = new Array<Bytes>(0);
+            output.blockNumber = blockNumber;
+            output.blockTimestamp = blockTimestamp;
+            output.transactionHash = txHash;
         }
         output.operator = 'WrapAsPublicHandle';
         output.parentHandles = new Array<Bytes>(0);
         output.plaintext = plaintext;
-        output.transactionHash = txHash;
-        output.blockNumber = blockNumber;
-        output.blockTimestamp = blockTimestamp;
         output.save();
     }
 }
