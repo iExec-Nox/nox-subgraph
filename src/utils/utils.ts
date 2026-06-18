@@ -20,9 +20,7 @@ export function getOrCreateHandle(
         handle.blockNumber = blockNumber;
         handle.blockTimestamp = blockTimestamp;
         handle.transactionHash = txHash;
-        if (plaintext !== null) {
-            handle.plaintext = plaintext;
-        }
+        handle.plaintext = plaintext;
         handle.save();
     }
     return handle;
