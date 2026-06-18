@@ -571,7 +571,7 @@ describe('Handle Lineage Tests', () => {
             assert.entityCount('Handle', 1);
         });
 
-        test('Discovery metadata (blockNumber, blockTimestamp, transactionHash) is preserved when handle reappears as operation output', () => {
+        test('Handle fields are immutable once created (no overwrite when handle reappears as operation output)', () => {
             clearStore();
 
             const firstBlockNumber = BigInt.fromI32(100);
@@ -586,6 +586,8 @@ describe('Handle Lineage Tests', () => {
             handleAllowed(allowedEvent);
 
             const resultHex = resultHandle.toHexString();
+            assert.fieldEquals('Handle', resultHex, 'operator', '');
+            assert.fieldEquals('Handle', resultHex, 'parentHandles', '[]');
             assert.fieldEquals('Handle', resultHex, 'blockNumber', firstBlockNumber.toString());
             assert.fieldEquals(
                 'Handle',
@@ -606,7 +608,8 @@ describe('Handle Lineage Tests', () => {
             addEvent.transaction.hash = secondTxHash;
             handleAdd(addEvent);
 
-            assert.fieldEquals('Handle', resultHex, 'operator', 'Add');
+            assert.fieldEquals('Handle', resultHex, 'operator', '');
+            assert.fieldEquals('Handle', resultHex, 'parentHandles', '[]');
             assert.fieldEquals('Handle', resultHex, 'blockNumber', firstBlockNumber.toString());
             assert.fieldEquals(
                 'Handle',

@@ -3,24 +3,26 @@ import { Handle, HandleRole } from '../../generated/schema';
 
 export function getOrCreateHandle(
     handleId: Bytes,
+    operator: string,
+    parentHandles: Bytes[],
     blockNumber: BigInt,
     blockTimestamp: BigInt,
     txHash: Bytes,
+    plaintext: Bytes | null = null,
 ): Handle {
     let handle = Handle.load(handleId);
     if (handle == null) {
         handle = new Handle(handleId);
         handle.isPubliclyDecryptable = false;
-        // Handle is being created as a side-effect (ACL event, or operand
-        // discovered by a child operation). There is no "creation tx" for
-        // handles created through the gateway, so we record the discovering
-        // tx to ensure downstream consumers get a non-null transactionHash.
-        handle.operator = '';
-        handle.parentHandles = new Array<Bytes>(0);
+        handle.operator = operator;
+        handle.parentHandles = parentHandles;
         handle.childHandles = new Array<Bytes>(0);
         handle.blockNumber = blockNumber;
         handle.blockTimestamp = blockTimestamp;
         handle.transactionHash = txHash;
+        if (plaintext !== null) {
+            handle.plaintext = plaintext;
+        }
         handle.save();
     }
     return handle;
@@ -35,58 +37,30 @@ export function createOperation(
     blockTimestamp: BigInt,
 ): void {
     for (let i = 0; i < operandIds.length; i++) {
-        getOrCreateHandle(operandIds[i], blockNumber, blockTimestamp, txHash);
+        getOrCreateHandle(
+            operandIds[i],
+            '',
+            new Array<Bytes>(0),
+            blockNumber,
+            blockTimestamp,
+            txHash,
+        );
     }
 
     for (let i = 0; i < outputIds.length; i++) {
-        let output = Handle.load(outputIds[i]);
-        if (output == null) {
-            output = new Handle(outputIds[i]);
-            output.isPubliclyDecryptable = false;
-            output.childHandles = new Array<Bytes>(0);
-            output.blockNumber = blockNumber;
-            output.blockTimestamp = blockTimestamp;
-            output.transactionHash = txHash;
-        }
-        output.operator = operator;
-        output.parentHandles = operandIds;
-        output.save();
+        getOrCreateHandle(outputIds[i], operator, operandIds, blockNumber, blockTimestamp, txHash);
     }
 
     for (let i = 0; i < operandIds.length; i++) {
-        let parent = Handle.load(operandIds[i]);
+        const parent = Handle.load(operandIds[i]);
         if (parent != null) {
-            let children = parent.childHandles;
+            const children = parent.childHandles;
             for (let j = 0; j < outputIds.length; j++) {
                 children.push(outputIds[j]);
             }
             parent.childHandles = children;
             parent.save();
         }
-    }
-}
-
-export function createWrapAsPublicHandleOperation(
-    plaintext: Bytes,
-    outputIds: Bytes[],
-    txHash: Bytes,
-    blockNumber: BigInt,
-    blockTimestamp: BigInt,
-): void {
-    for (let i = 0; i < outputIds.length; i++) {
-        let output = Handle.load(outputIds[i]);
-        if (output == null) {
-            output = new Handle(outputIds[i]);
-            output.isPubliclyDecryptable = false;
-            output.childHandles = new Array<Bytes>(0);
-            output.blockNumber = blockNumber;
-            output.blockTimestamp = blockTimestamp;
-            output.transactionHash = txHash;
-        }
-        output.operator = 'WrapAsPublicHandle';
-        output.parentHandles = new Array<Bytes>(0);
-        output.plaintext = plaintext;
-        output.save();
     }
 }
 

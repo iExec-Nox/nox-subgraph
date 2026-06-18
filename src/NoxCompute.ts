@@ -1,3 +1,4 @@
+import { Bytes } from '@graphprotocol/graph-ts';
 import {
     Add as AddEvent,
     Allowed as AllowedEvent,
@@ -22,18 +23,15 @@ import {
     ViewerAdded as ViewerAddedEvent,
     WrapAsPublicHandle as WrapAsPublicHandleEvent,
 } from '../generated/NoxCompute/NoxCompute';
-import {
-    createOperation,
-    createRole,
-    createWrapAsPublicHandleOperation,
-    getOrCreateHandle,
-} from './utils/utils';
+import { createOperation, createRole, getOrCreateHandle } from './utils/utils';
 
 // ============ ACL Handlers ============
 
 export function handleAllowed(event: AllowedEvent): void {
     const handle = getOrCreateHandle(
         event.params.handle,
+        '',
+        new Array<Bytes>(0),
         event.block.number,
         event.block.timestamp,
         event.transaction.hash,
@@ -54,6 +52,8 @@ export function handleAllowed(event: AllowedEvent): void {
 export function handleMarkedAsPubliclyDecryptable(event: MarkedAsPubliclyDecryptableEvent): void {
     const handle = getOrCreateHandle(
         event.params.handle,
+        '',
+        new Array<Bytes>(0),
         event.block.number,
         event.block.timestamp,
         event.transaction.hash,
@@ -65,6 +65,8 @@ export function handleMarkedAsPubliclyDecryptable(event: MarkedAsPubliclyDecrypt
 export function handleViewerAdded(event: ViewerAddedEvent): void {
     const handle = getOrCreateHandle(
         event.params.handle,
+        '',
+        new Array<Bytes>(0),
         event.block.number,
         event.block.timestamp,
         event.transaction.hash,
@@ -85,12 +87,14 @@ export function handleViewerAdded(event: ViewerAddedEvent): void {
 // ============ WrapAsPublicHandle Handler ============
 
 export function handleWrapAsPublicHandle(event: WrapAsPublicHandleEvent): void {
-    createWrapAsPublicHandleOperation(
-        event.params.plaintext,
-        [event.params.result],
-        event.transaction.hash,
+    getOrCreateHandle(
+        event.params.result,
+        'WrapAsPublicHandle',
+        new Array<Bytes>(0),
         event.block.number,
         event.block.timestamp,
+        event.transaction.hash,
+        event.params.plaintext,
     );
 }
 
